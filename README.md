@@ -8,5 +8,5 @@
 - David W. Hogg (NYU) (MPIA) (SCDA)
 - Andrew R. Casey (Cambridge)
 
-# installation
+# Installation
 pip install https://github.com/peraktong/Cannon-Experiment.git
