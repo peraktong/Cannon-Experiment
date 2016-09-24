@@ -1,7 +1,7 @@
 # Cannon-Experiment
-The Cannon 2: Compressed sensing edition
-Add three parameters to the fit spectrum model
-The model is still under construction
+-The Cannon 2: Compressed sensing edition
+-Add three parameters to the fit spectrum model
+-The model is still under construction
 
 # Authors
 - Jason Cao (NYU)
