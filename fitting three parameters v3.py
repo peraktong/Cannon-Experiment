@@ -50,9 +50,7 @@ class fit_neighborhood:
                 z_data = np.ones(n_star)
             x0 = np.array([0, 1, 0])
             # fit
-            popt, pcov= optimization.curve_fit(func, (x_data, y_data, z_data),nor[:,i], x0)
-            #least square fit
-            #popt, pcov = optimization.leastsq(func, x0,args=((x_data, y_data, z_data),nor[:,i]))
+            popt, pcov= optimization.curve_fit(func, (x_data, y_data, z_data),nor[:,i], x0,method="lm")
             parameters = np.c_[parameters,popt]
         self.parameters = parameters
         with open("fitting parameters-3.csv", "wb") as f:
