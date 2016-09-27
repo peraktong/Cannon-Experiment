@@ -36,7 +36,7 @@ for p in range(0,nor[:,0].size):
     chi_opt = np.append(chi_opt,a_opt)
     #p_old.append(b_opt)
 
-print(chi_opt.shape)
+
 # plot
 
 
