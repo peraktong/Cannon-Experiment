@@ -125,9 +125,8 @@ class fit_neighborhood:
 
         # infer flux from the parameters
         # add scale factor
-        scale = parameters[0] + parameters[1] + parameters[2]
 
-        opt_flux = (parameters[0]*x_data+parameters[1]*y_data+parameters[2]*z_data)/scale
+        opt_flux = (parameters[0]*x_data+parameters[1]*y_data+parameters[2]*z_data)
 
         self.optimized_spectrum = opt_flux
 
