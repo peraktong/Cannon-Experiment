@@ -91,7 +91,7 @@ class fit_neighborhood:
 
 
 
-        """
+
 
         output = open('x_data.pkl', 'wb')
         pickle.dump(x_data, output)
@@ -105,21 +105,24 @@ class fit_neighborhood:
         pickle.dump(z_data, output)
         output.close()
 
-        """
+        # add a value to minimize the influence of outlier
+        scale = 4
+        trial = np.ones((548, 8575)) * scale
 
-
-
-
-        x_data_r = x_data.ravel()
-        y_data_r = y_data.ravel()
-        z_data_r = z_data.ravel()
-        print(x_data.shape,y_data.shape,z_data.shape,nor.shape)
-        nor_r = nor.ravel()
-
-        # The trick is here. give x,y,z equal positions
-        x0 = np.array([0, 0, 0])
         # fit
-        popt, pcov= optimization.curve_fit(func, (x_data_r, y_data_r, z_data_r),nor_r, x0)
+        x_data_r = (trial + x_data).ravel()
+        y_data_r = (trial + y_data).ravel()
+        z_data_r = (trial + z_data).ravel()
+        # print(x_data.shape, y_data.shape, z_data.shape, nor.shape)
+        nor_r = (nor + trial).ravel()
+
+        # set bounds
+        para_bounds = ([-np.inf, 0.81, -np.inf], [np.inf, 1, np.inf])
+
+        x0 = np.array([0,1,0])
+
+        popt, pcov = optimization.curve_fit(func, (x_data_r, y_data_r, z_data_r),
+                                            nor_r, x0, bounds=para_bounds)
         parameters = popt
 
 
@@ -133,7 +136,7 @@ class fit_neighborhood:
         print(parameters[0],parameters[1],parameters[2],parameters[0]+parameters[1]+parameters[2])
         #save the optimized spectrum
 
-        output = open('optimized_spectrum_v4.pkl', 'wb')
+        output = open('optimized_spectrum_v5.pkl', 'wb')
         pickle.dump(opt_flux, output)
         output.close()
 
@@ -229,5 +232,5 @@ print(trial.fitting_spectrum_parameters().shape)
 
 trial.plot_spectrum()
 trial.plot_chi_square()
-# trial.plot_chi_square_single()
+#trial.plot_chi_square_single()
 print(trial.optimized_spectrum.shape)
