@@ -141,6 +141,11 @@ The method we use is to represent the spectrum at pixel j by using the inferred 
 
 Then fit \(y_{j,n}^{optimized} \) with \(y_{jn}\), where \(y_{jn}\) is the spectrum data for star n at wavelength pixel j. The optimization method we use is Levenberg - Marquardt algorithm.
 a+b+c should be equal to 1.
+\bigskip
+
+There are some tricks in the fitting. Because the fitting module is very sensitive to the outliers in the spectrum data, we add a constant to the flux and subtract it after the fitting. The result is better because a+b+c is closer to 1, which is 0.996 compared to 0.983.
+\bigskip
+Also, we add a bound to the parameters to make b is bigger than a or c. set the range of b as (0.8,1.2)
 
 The code is as followed:
 \bigskip
@@ -161,7 +166,7 @@ and \( y_{j+1,n}^{inferred}\)
 
 parameters are a, b and c
 
-The result is \(a+b+c = 0.983661295269\). (a,b,c) = (0.338, 0.110, 0.536)
+The result is \(a+b+c = 0.997\). (a,b,c) = (-0.005,0.810, 0.192)
 
 Calculate the optimized spectrum \( y_{j,n}^{optimized}\) by using (2)
 \bigskip
@@ -186,7 +191,7 @@ If the optimization works, we will optimized \(\theta_{j}\) besides a,b and c, w
 
  
  Then compare the chi-square for aspcapStar-v304-2M16421116+3618225 of the two methods:
- chi-square for \( y_{j,n}^{inferred}\) and \( y_{j,n}^{optimized}\) are 145.84 and 145.89
+ chi-square for \( y_{j,n}^{inferred}\) and \( y_{j,n}^{optimized}\) are 302.41 and 304.21
  They are similar to each other.
  
  %% Fourth paragraph
