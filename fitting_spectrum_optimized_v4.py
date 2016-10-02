@@ -105,24 +105,19 @@ class fit_neighborhood:
         pickle.dump(z_data, output)
         output.close()
 
-        # add a value to minimize the influence of outlier
-        scale = 4
-        trial = np.ones((548, 8575)) * scale
-
         # fit
-        x_data_r = (trial + x_data).ravel()
-        y_data_r = (trial + y_data).ravel()
-        z_data_r = (trial + z_data).ravel()
+        x_data_r = x_data.ravel()
+        y_data_r = y_data.ravel()
+        z_data_r = z_data.ravel()
         # print(x_data.shape, y_data.shape, z_data.shape, nor.shape)
-        nor_r = (nor + trial).ravel()
+        nor_r = nor.ravel()
 
-        # set bounds
-        para_bounds = ([-np.inf, 0.81, -np.inf], [np.inf, 1, np.inf])
+
 
         x0 = np.array([0,1,0])
 
         popt, pcov = optimization.curve_fit(func, (x_data_r, y_data_r, z_data_r),
-                                            nor_r, x0, bounds=para_bounds)
+                                            nor_r, x0)
         parameters = popt
 
 
