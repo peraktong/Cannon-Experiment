@@ -98,7 +98,7 @@ Coming soon...
  
  \section{\label{sec:level1}Assumption and method}
  
-Suppose we have a trained model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. 
+Suppose we have a trained model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. Every pixel is related to a specific wave length. It belongs to APOGEE release 10 and has a good quality. These stellar are the very same objects as used by the APOGEE survey for the calibration of DR10. Each of them has at least nine stellar labels. But in the training step, we only use three labels: $T_{eff}$, $log$ g  and $\left[Fe/H\right]$. They span the range of $3500K <T_{eff}< 5300K$, $0 <log$ $g< 5$ and $-2.5 <\left[Fe/H\right]< 0.45$.
 
 The model we adopt
  \[y_{jn} = v(l_n) \cdot \theta_{j} + e_{jn} (1)\]                      
@@ -135,37 +135,131 @@ The Cannon 2 can predict the spectrum pretty well. But we can still improve it.
 From the inferred spectrum \(y_{jn}^{inferred}\), we optimize it and generate a better synthesized spectrum, which we call \(y_{jn}^{optimized}\).
 \bigskip
 
-The method we use is to represent the spectrum at pixel j by using the inferred spectrum at pixel j-1,pixel j and pixel j+1.(If the pixel is out of range, set the flux as 1). 
+The method we use is to represent the spectrum at pixel j by using the inferred spectrum at pixel j-1,pixel j and pixel j+1.(If the pixel is out of range, set the flux as 1). The data we use is the same as the training step.
 \bigskip
 
-Because linear regression is sensitive to bad data points, extra parameters need to be added to describe the bad data points. Here we introduce \(\big\{q_n\big\}_{n=1}^{N}\), \(P\), \(Y\) and \(V\). 
-
-We need to find a correct objective function! 
+The objective function is linear :
 \[y_{j,n}^{optimized}=a\cdot y_{j-1,n}^{inferred}+b\cdot y_{j,n}^{inferred}+c\cdot y_{j+1,n}^{inferred}(2)\]
+
+And the Jacobian Matrix of the objective function with respect to parameters 
+\[J = \left[y_{j-1,n}^{inferred}/\sigma_{j-1,n}, y_{j,n}^{inferred}/\sigma_{j,n},, y_{j+1,n}^{inferred}/\sigma_{j+1,n},\right]\]
+Where $\sigma{j,n}$ is the uncertainty for pixel j of stellar n.
 \bigskip
 
 
-Then fit \(y_{j,n}^{optimized} \) with \(y_{jn}\), where \(y_{jn}\) is the spectrum data for star n at wavelength pixel j. The optimization method we use is Levenberg - Marquardt algorithm.
-a+b+c should be equal to 1.
+Then fit \(y_{j,n}^{optimized} \) with \(y_{jn}\), where \(y_{jn}\) is the spectrum data for star n at wavelength pixel j. The optimization method we use is the least chi-squared method.
 \bigskip
 
+To obtain a,b and c, we introduce several matrix: Y, A and C. Here the numbers of stellar and pixel each star are $n-star$ and $n-pixel$
 
-The code is as followed:
+% insert matrix
+
+\[
+Y
+=
+\begin{bmatrix}
+    Y_1&Y_2 &\dots&Y_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+ Y_n
+=
+\begin{bmatrix}
+    y_{1,n} \\
+    y_{2,n} \\
+    \vdots  \\
+    y_{j,n}  \\
+    
+\end{bmatrix}
+\]
+
+% A
+\[
+A
+=
+\begin{bmatrix}
+    A_1&A_2 &\dots&A_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+A_n
+=
+\begin{bmatrix}
+    
+    1 & y_{1,n} ^{inferred} & y_{2,n} ^{inferred}\\
+    y_{1,n}^{inferred}&y_{2,n}^{inferred}& y_{3,n}^{inferred}  \\
+    \vdots & \vdots & \vdots \\
+    y_{j-1,n}^{inferred}&y_{j,n}^{inferred}& 1  \\
+
+\end{bmatrix}
+\]
+
+
+
+% sigma-C
+
+\[
+C
+=
+\begin{bmatrix}
+    C_1&C_2 &\dots&C_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+C_n
+=
+\begin{bmatrix}
+    
+    \sigma_{1,n}&0&\dots&0\\
+    0& \sigma_{2,n}&\dots&0 \\
+    \vdots & \vdots & \vdots \\
+    0&\dots&0&\sigma_{j,n}  \\
+
+\end{bmatrix}
+\]
+
+$\sigma_{j,n} $is the uncertainty for pixel j of star n. 
 \bigskip
 
+We cut the matrix Y,A and C into n-star smaller matrix so the calculation speed is higher. To calculate a,b and c.
 
 
-popt, pcov= optimization.curve\_fit(func, (x\_data, y\_data, z\_data),nor\_r, x0, sigma=error)
-\bigskip
+ \(X = 
+ \begin{bmatrix}
+    
+    a\\
+    b \\
+    c \\
+
+\end{bmatrix}
+\)=$\sum_{n=1}^{n-star} X_n \over{n-star}$
 
 
-parameters = popt
-\bigskip
+where
+\[
+X_n = 
+\begin{bmatrix}
+    
+    a_n\\
+    b_n \\
+    c_n \\
 
-x\_data, y\_data and z\_data are \(y_{j-1,n}^{inferred},y_{j,n}^{inferred} \)
+\end{bmatrix}
+=\left[A_n^TC^{-1}_nA_n\right]^{-1}\left[A_n^TC^{-1}_nY_n\right]
+\]
 
-and \( y_{j+1,n}^{inferred}\)
-\bigskip
+
+
+
 
 parameters are a, b and c. b should be much bigger than both a and c. And a+b+c should be equal to 1.
 
