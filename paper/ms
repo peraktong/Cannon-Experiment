@@ -1,0 +1,352 @@
+% ****** Start of file apssamp.tex ******
+%
+%   This file is part of the APS files in the REVTeX 4.1 distribution.
+%   Version 4.1r of REVTeX, August 2010
+%
+%   Copyright (c) 2009, 2010 The American Physical Society.
+%
+%   See the REVTeX 4 README file for restrictions and more information.
+%
+% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
+% as well as the rest of the prerequisites for REVTeX 4.1
+%
+% See the REVTeX 4 README file
+% It also requires running BibTeX. The commands are as follows:
+%
+%  1)  latex apssamp.tex
+%  2)  bibtex apssamp
+%  3)  latex apssamp.tex
+%  4)  latex apssamp.tex
+%
+\documentclass[%
+ reprint,
+%superscriptaddress,
+%groupedaddress,
+%unsortedaddress,
+%runinaddress,
+%frontmatterverbose, 
+%preprint,
+%showpacs,preprintnumbers,
+%nofootinbib,
+%nobibnotes,
+%bibnotes,
+ amsmath,amssymb,
+ aps,
+%pra,
+%prb,
+%rmp,
+%prstab,
+%prstper,
+%floatfix,
+]{revtex4-1}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage{hyperref}% add hypertext capabilities
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+%\usepackage[showframe,%Uncomment any one of the following lines to test 
+%%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
+%%text={7in,10in},centering,
+%%margin=1.5in,
+%%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
+%%height=10in,a5paper,hmargin={3cm,0.8in},
+%]{geometry}
+
+\begin{document}
+
+\preprint{APS/123-QED}
+
+\title{Optimized Synthesized Spectrum}% Force line breaks with \\
+
+
+\author{Jason Cao}
+
+
+\affiliation{%
+ Physics Department, New York University
+}%
+
+
+\date{\today}% It is always \today, today,
+             %  but any date may be explicitly specified
+
+\begin{abstract}
+The Cannon 2 is a powerful tool, which can infer labels from the spectrum after it's trained. Also, it can generate the spectrum. Here we start at the point that the model is trained. First, infer the spectrum by using the Cannon 2. Then optimize the method and generate a better spectrum. Finally, compare the synthesized spectrum with the real spectrum and check whether the optimization works.
+\begin{description}
+
+\item[Structure]
+There are four sections. The first part is the introduction part, which describes the background of the method. Then in the assumptions and method part, we show the detail of our method. The next section is the experiment, where the experiment results are showed. Finally, we discuss our results.
+\end{description}
+\end{abstract}
+
+\pacs{}% PACS, the Physics and Astronomy
+                             % Classification Scheme.
+%\keywords{Suggested keywords}%Use showkeys class option if keyword
+                              %display desired
+\maketitle
+
+%\tableofcontents
+
+\section{\label{sec:level1}Introduction}
+
+Coming soon...
+ 
+ %% second paragraph
+ 
+ \section{\label{sec:level1}Assumption and method}
+ \subsection{\label{sec:level2}Optimized the spectrum}
+ 
+Suppose we have a trained model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. Every pixel is related to a specific wave length. It belongs to APOGEE release 10 and has a good quality. These stellar are the very same objects as used by the APOGEE survey for the calibration of DR10. Each of them has at least nine stellar labels. But in the training step, we only use three labels: $T_{eff}$, $log$ g  and $\left[Fe/H\right]$. They span the range of $3500K <T_{eff}< 5300K$, $0 <log$ $g< 5$ and $-2.5 <\left[Fe/H\right]< 0.45$.
+
+The model we adopt
+ \[y_{jn} = v(l_n) \cdot \theta_{j} + e_{jn} (1)\]                      
+ 
+ Where \(y_{jn}\) is the spectrum data for star n at wavelength pixel j. 
+ And \(v(l_n)\) is the vectorizing function. 
+The input \(l_n\) is the label list of length K for star n and the  output 
+\(v(l_n)\) is a vector of length D (D is bigger than K).
+\( \theta_{j}\) is a vector of length D of parameters which controlling the model at wavelength pixel j.
+\( e_{jn}\) is a noise draw or residual at pixel j for star n.
+
+
+The inferred label for stellar n \(l_n^{inferred}\) and \( \theta_{j}\) are available after the training step.
+Then infer spectrum by using:
+ \[y_{jn}^{inferred} = v(l_n^{inferred}) \cdot \theta_{j}  \]
+ 
+ This is how to obtain the synthesized spectrum by using the Cannon 2.
+ The code is as followed:
+ 
+ \bigskip
+inferred\_labels = model.fit\_labelled\_set()
+
+ \bigskip
+v = model.vectorizer.get\_label\_vector(inferred\_labels)
+\bigskip
+ 
+inferred\_flux = np.dot(v,model.theta.T)
+ \bigskip
+
+
+The Cannon 2 can predict the spectrum pretty well. But we can still improve it.
+\bigskip
+
+From the inferred spectrum \(y_{jn}^{inferred}\), we optimize it and generate a better synthesized spectrum, which we call \(y_{jn}^{optimized}\).
+\bigskip
+
+The method we use is to represent the spectrum at pixel j by using the inferred spectrum at pixel j-1,pixel j and pixel j+1.(If the pixel is out of range, set the flux as 1). The data we use is the same as the training step.
+\bigskip
+
+The objective function is linear :
+\[y_{j,n}^{optimized}=a\cdot y_{j-1,n}^{inferred}+b\cdot y_{j,n}^{inferred}+c\cdot y_{j+1,n}^{inferred}(2)\]
+
+And the Jacobian Matrix of the objective function with respect to parameters 
+\[J = \left[y_{j-1,n}^{inferred}/\sigma_{j-1,n}, y_{j,n}^{inferred}/\sigma_{j,n},, y_{j+1,n}^{inferred}/\sigma_{j+1,n},\right]\]
+Where $\sigma_{j,n}$ is the uncertainty for pixel j of stellar n.
+\bigskip
+
+
+Then fit \(y_{j,n}^{optimized} \) with \(y_{jn}\), where \(y_{jn}\) is the spectrum data for star n at wavelength pixel j. The optimization method we use is the least chi-squared method.
+\bigskip
+
+To obtain a,b and c, we introduce several matrix: Y, A and C. Here the numbers of stellar and pixel each star are $n-star$ and $n-pixel$
+
+% insert matrix
+
+\[
+Y
+=
+\begin{bmatrix}
+    Y_1&Y_2 &\dots&Y_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+ Y_n
+=
+\begin{bmatrix}
+    y_{1,n} \\
+    y_{2,n} \\
+    \vdots  \\
+    y_{j,n}  \\
+    
+\end{bmatrix}
+\]
+
+% A
+\[
+A
+=
+\begin{bmatrix}
+    A_1&A_2 &\dots&A_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+A_n
+=
+\begin{bmatrix}
+    
+    1 & y_{1,n} ^{inferred} & y_{2,n} ^{inferred}\\
+    y_{1,n}^{inferred}&y_{2,n}^{inferred}& y_{3,n}^{inferred}  \\
+    \vdots & \vdots & \vdots \\
+    y_{j-1,n}^{inferred}&y_{j,n}^{inferred}& 1  \\
+
+\end{bmatrix}
+\]
+
+
+
+% sigma-C
+
+\[
+C
+=
+\begin{bmatrix}
+    C_1&C_2 &\dots&C_{n-star}\\
+    
+\end{bmatrix}
+\]
+
+where
+\[
+C_n
+=
+\begin{bmatrix}
+    
+    \sigma_{1,n}&0&\dots&0\\
+    0& \sigma_{2,n}&\dots&0 \\
+    \vdots & \vdots & \vdots \\
+    0&\dots&0&\sigma_{j,n}  \\
+
+\end{bmatrix}
+\]
+
+$\sigma_{j,n} $is the uncertainty for pixel j of star n. 
+\bigskip
+
+We cut the matrix Y,A and C into n-star smaller matrix so the calculation speed is higher. To calculate a,b and c.
+
+
+ \(X = 
+ \begin{bmatrix}
+    
+    a\\
+    b \\
+    c \\
+
+\end{bmatrix}
+\)=$\sum_{n=1}^{n-star} X_n \over{n-star}$
+
+
+where
+\[
+X_n = 
+\begin{bmatrix}
+    
+    a_n\\
+    b_n \\
+    c_n \\
+
+\end{bmatrix}
+=\left[A_n^TC^{-1}_nA_n\right]^{-1}\left[A_n^TC^{-1}_nY_n\right]
+\]
+
+
+
+
+
+Parameters are a, b and c. b should be much bigger than both a and c. And a+b+c should be equal to 1.
+
+The result is \(a+b+c = 0.9996\). 
+
+(a,b,c) = (0.0423 ,0.9173 ,0.0404 ).
+
+
+Calculate the optimized spectrum \( y_{j,n}^{optimized}\) by using (2). The Experiment 1 shows that the optimization works.
+\bigskip
+
+
+
+%If the optimization works, we will optimized \(\theta_{j}\) besides a, b and c, which will come soon.
+%It works!
+
+ \subsection{\label{sec:level2}Optimized $\theta_{j}$ and inferred labels}
+ After the optimization of the inferred spectrum, we can modify $\theta_{j}$ and get a better result. The method is to represent $\theta_j$ by using $\theta_{j-1}$ , $\theta_j$ and $\theta_{j+1}$. If $\theta$ is out of range, set it to zero. So we have:
+ \[\theta_{j,n}^{optimized}=a\cdot \theta_{j-1,n}+b\cdot \theta_{j,n}+c\cdot \theta_{j+1,n}(3)\]
+ \bigskip
+ 
+ Here a,b and c are the parameters from the optimization of spectrum. Then we infer stellar labels by using $\theta_{j,n}^{optimized}$ and generate optimized inferred labels. The data we use is the training set, which includes 548 stellar with 8575 pixel each.
+ Finally, compare the chi-squared to check whether the optimization works.
+
+
+%% Third paragraph
+ 
+ \section{\label{sec:level1}Experiment}
+ \subsection{\label{sec:level2}Experiment 1}
+ 
+ Choose four stellar: 
+ 
+ Star A  $T_{eff} =4750$  log g =3.0 $\left[Fe/h\right] =0.15$
+ 
+ Star B  $T_{eff} =4849$  log g =2.2 $\left[Fe/h\right] =-1.0$
+ 
+ Star C  $T_{eff} =3614$  log g =0.4 $\left[Fe/h\right] =-0.68$
+ 
+ Star D  $T_{eff} =5003$  log g =2.8 $\left[Fe/h\right] =-0.71$
+ 
+ 
+ Then plot the spectrum
+ 
+ The black line "Observed" is the observed spectrum from the data  \(y_{jn}\).
+ The green line "inferred" is \( y_{j,n}^{inferred}\) , which is generated by the Cannon 2.
+ The red line "optimized" is \( y_{j,n}^{optimized}\), which is generated by (2)
+\bigskip
+
+
+ 
+%\includegraphics[width=70mm]{figure_1.png}
+\bigskip
+
+
+
+%\includegraphics[width=70mm]{figure_2.png}
+ 
+ 
+
+ 
+ Finally compare the chi-square for these four stars of the two methods:
+ The optimized spectrum has a 1\% smaller chi-squared so our optimization works.
+  
+ \subsection{\label{sec:level2}Experiment 2}
+ Optimize $\theta$ and generate optimized inferred spectrum. Then plot the inferred spectrum and the optimized inferred spectrum.
+ \bigskip
+ 
+ %\includegraphics[width=70mm]{figure_3.png}
+ \bigskip
+ 
+ Finally compare the chi-square.
+ 
+ Unfortunately, the chi-squared becomes 1\% bigger after the optimization.
+
+  
+  
+ %% Fourth paragraph
+
+ \section{\label{sec:level1}Discussion}
+ 
+ Coming soon.
+ 
+ 
+
+
+
+\end{document}
+%
+% ****** End of file apssamp.tex ******
