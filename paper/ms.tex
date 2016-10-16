@@ -4,7 +4,7 @@
 \geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
 %\geometry{landscape}                		% Activate for rotated page geometry
 %\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
-\usepackage{graphicx}				% Use pdf, png, jpg, or epsÂ§ with pdflatex; use eps in DVI mode
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
 \usepackage{amsmath, amsthm, amssymb, amsfonts}
@@ -50,7 +50,7 @@ Coming soon...
  %% second paragraph
  
  \section{\label{sec:level1}Assumption and method}
- \subsection{\label{sec:level2}Optimized the spectrum}
+ \subsection{\label{sec:level2}Optimize the spectrum}
 
  
 Suppose we have a trained model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. Every pixel is related to a specific wave length. It belongs to APOGEE data release 10 and has a good quality. These stellar are the very same objects as used by the APOGEE survey for the calibration of DR10. Each of them has at least nine stellar labels. But in the training step, we only use three of them $T_{eff}$, $log$ g  and $\left[Fe/H\right]$. They span the range of $3500K <T_{eff}< 5300K$, $0 <log$ $g< 5$ and $-2.5 <\left[Fe/H\right]< 0.45$.
@@ -67,7 +67,7 @@ The input \(l_n\) is the label list of length K for star n and the  output
 \( e_{jn}\) is a noise draw or residual at pixel j for star n.
 
 
-The inferred label for stellar n \(l_n^{inf}\) and \( \theta_{j}\) are available after the training step.
+\(l_n^{inf}\) and \( \theta_{j}\) are available after the training step.
 Infer spectrum by using:
  \[y_{jn}^{inf} = v(l_n^{inf}) \cdot \theta_{j}  (2)\]
  
@@ -86,13 +86,13 @@ The new spectrum, which is the optimized spectrum, is represented by:
 \[y_{j,n}^{opt}=a\cdot y_{j-1,n}^{inf}+b\cdot y_{j,n}^{inf}+c\cdot y_{j+1,n}^{inf}(3)\]
 \bigskip
 
-The method we use is the least chi-squared method. So our objective function is the chi-squared between the optimized spectrum and the spectrum data. 
+We use the least chi-squared method. So our objective function is the chi-squared between the optimized spectrum and the spectrum data. 
 \bigskip
 
 $F_{obj} (a,b,c)$= \[\sum_{n=1,j=1}^{n=N,j=J} {(y_{jn} - y_{jn}^{opt})^2 \over{\sigma_{jn}^2}} \]  (4)
 \bigskip
 
-$\sigma_{jn}^2$ is the data uncertainty for star n at pixel j. The number of stellar and pixel each star are N and J. Writing the objective function in the form of matrix can make it simpler. So we introduce several matrix: Y, A, C and X, which are defined as followed:
+$\sigma_{jn}^2$ is the data uncertainty for star n at pixel j. The number of stellar and pixel each star are N and J. Here N=548 and J = 8575. Write the objective function in the form of matrix can make it simpler. So we introduce several matrix: Y, A, C and X, which are defined as followed:
 
 % insert matrix
 
@@ -113,7 +113,7 @@ where
     y_{1,n} \\
     y_{2,n} \\
     \vdots  \\
-    y_{j,n}  \\
+    y_{J,n}  \\
     
 \end{bmatrix}
 \]
@@ -137,7 +137,7 @@ A_n
     1 & y_{1,n} ^{inf} & y_{2,n} ^{inf}\\
     y_{1,n}^{inf}&y_{2,n}^{inf}& y_{3,n}^{inf}  \\
     \vdots & \vdots & \vdots \\
-    y_{j-1,n}^{inf}&y_{j,n}^{inf}& 1  \\
+    y_{J-1,n}^{inf}&y_{J,n}^{inf}& 1  \\
 
 \end{bmatrix}
 \]
@@ -182,7 +182,7 @@ C_n
 \)
 
 
-We cut matrix Y, A and C into n-star smaller matrix so the calculation speed is higher. 
+We cut matrix Y, A and C into N smaller matrix so the calculation speed is higher. 
 \bigskip
 
 Now the objective function can be described as:
@@ -229,7 +229,7 @@ Calculate the optimized spectrum \( y_{j,n}^{opt}\) by using (3). The Experiment
  \section{\label{sec:level1}Experiment}
  \subsection{\label{sec:level2}Experiment 1}
  
- Choose four stellar: 
+ Choose four stellar, which are not in the training set: 
  
  Star A  $T_{eff} =4750$  log g =3.0 $\left[Fe/h\right] =0.15$
  
