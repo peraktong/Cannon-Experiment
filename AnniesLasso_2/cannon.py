@@ -208,11 +208,11 @@ class CannonModel(model.BaseCannonModel):
 
     # By Jason Cao
     # Input normalized_flux and normalized)ivar
-    # return optimized_flux and optimized_theta
-    def fitting_spectrum_parameters(self,normalized_flux,normalized_ivar):
+    # return optimized_flux, optimized_theta parameters and the variation of the parameters vs star
+    # All of them are np.array
+    def fitting_spectrum_parameters(self,normalized_flux,normalized_ivar,inf_flux):
         nor = normalized_flux
-        inferred_labels = self.fit_labelled_set()
-        inf = np.dot(self.theta, self.vectorizer(inferred_labels).T).T
+        inf = inf_flux
         ivar = normalized_ivar
         n_pixel = nor[0, :].size
         n_star = inf[:, 0].size
@@ -239,6 +239,7 @@ class CannonModel(model.BaseCannonModel):
 
         left = np.zeros((3,3))
         right = np.zeros(3)
+        parameters_long = np.array([0,1,0])
 
         for p in range(0, n_star):
 
@@ -262,11 +263,10 @@ class CannonModel(model.BaseCannonModel):
             left += np.dot(np.dot(a.T, c), a)
             right += np.dot(np.dot(a.T,c), y)
 
-
-        parameters = np.dot(inv(left),right)
+        parameters = np.dot(inv(left), right)
+        print(parameters[0],parameters[1],parameters[2],parameters[0]+parameters[1]+parameters[2])
 
         opt_flux = (parameters[0]*x_data+parameters[1]*y_data+parameters[2]*z_data)
-        print(parameters[0],parameters[1],parameters[2],parameters[0]+parameters[1]+parameters[2])
         #save the optimized spectrum
 
         # optimize theta
@@ -296,7 +296,75 @@ class CannonModel(model.BaseCannonModel):
         theta_opt = parameters[0] * theta_x + parameters[1] * theta_y + parameters[2] * theta_z
         print(parameters)
         theta_opt = theta_opt.T
-        return opt_flux,theta_opt
+        return opt_flux,theta_opt,parameters
+
+    # return the parameters of each star.
+    def fitting_spectrum_parameters_single(self,normalized_flux,normalized_ivar,inf_flux):
+        nor = normalized_flux
+        inf = inf_flux
+        ivar = normalized_ivar
+        n_pixel = nor[0, :].size
+        n_star = inf[:, 0].size
+        one = np.ones(n_star)
+
+        for pixel in range(0, n_pixel):
+            print("Building matrix",pixel,"{:.2f}%".format(pixel/n_pixel*100))
+            if pixel ==0 :
+                x_data = one
+                y_data = inf[:,pixel]
+                z_data = inf[:,pixel+1]
+
+            elif pixel>0 and pixel < n_pixel-1:
+                x_data = np.c_[x_data,inf[:,pixel-1]]
+                y_data = np.c_[y_data,inf[:,pixel]]
+                z_data = np.c_[z_data,inf[:,pixel+1]]
+
+            elif pixel == n_pixel-1:
+                x_data = np.c_[x_data, inf[:, pixel - 1]]
+                y_data = np.c_[y_data, inf[:, pixel]]
+                z_data = np.c_[z_data, one]
+        # fit
+        # It's not good. let's do it one star each time.
+
+
+
+        parameters = []
+        opt_flux = []
+
+        for p in range(0, n_star):
+
+            x_data_p = x_data[p, :]
+            y_data_p = y_data[p, :]
+            z_data_p = z_data[p, :]
+            nor_p = nor[p, :]
+            ivar_p = ivar[p, :]
+
+            # construct
+            ivar_r = ivar_p.ravel()
+            ni = len(ivar_r)
+            print("calculating parameters",p,"{:.2f}%".format(p/n_star*100))
+            c = np.zeros((ni, ni))
+
+            for i in range(0, ni):
+                c[i, i] = ivar_r[i]
+
+            y = nor_p.ravel()
+            a = np.c_[np.c_[x_data_p.ravel(), y_data_p.ravel()], z_data_p.ravel()]
+            left  = np.dot(np.dot(a.T, c), a)
+            right = np.dot(np.dot(a.T,c), y)
+            parameters_p = np.dot(inv(left), right)
+            print(parameters_p[0], parameters_p[1], parameters_p[2], parameters_p[0] + parameters_p[1] + parameters_p[2])
+
+            opt_flux_p = (parameters_p[0] * x_data + parameters_p[1] * y_data + parameters_p[2] * z_data)
+
+            parameters.append(parameters_p)
+            opt_flux.append(opt_flux_p)
+
+        parameters = np.array(parameters)
+        opt_flux = np.array(opt_flux)
+
+        return opt_flux,parameters
+
 
     def fit(self, normalized_flux, normalized_ivar, initial_labels=None,
         model_lsf=False, model_redshift=False, full_output=False, **kwargs):
@@ -394,7 +462,10 @@ class CannonModel(model.BaseCannonModel):
             else "Fitting {0} spectra".format(N_spectra)
 
         # add something
-        inferred_flux_opt,theta_opt = self.fitting_spectrum_parameters(normalized_flux,normalized_ivar)
+        inferred_labels = self.fit_labelled_set()
+        inf = np.dot(self.theta, self.vectorizer(inferred_labels).T).T
+
+        inferred_flux_opt,theta_opt,parameters = self.fitting_spectrum_parameters(normalized_flux,normalized_ivar,inf)
 
         f = utils.wrapper(_fit_spectrum,
                           (self.dispersion, initial_labels, self.vectorizer, theta_opt,
