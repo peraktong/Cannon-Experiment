@@ -239,7 +239,7 @@ class CannonModel(model.BaseCannonModel):
 
         left = np.zeros((3,3))
         right = np.zeros(3)
-        parameters_long = np.array([0,1,0])
+
 
         for p in range(0, n_star):
 
@@ -299,6 +299,11 @@ class CannonModel(model.BaseCannonModel):
         return opt_flux,theta_opt,parameters
 
     # return the parameters of each star.
+    # Now the uncertainty of parameters is also calculated
+    # The structure of the uncertainty is each row is aa,ab,ac ba....
+    # so the dimension is 3*3*N, which is a 3 dimension array
+    # use self.uncertainty to store
+
     def fitting_spectrum_parameters_single(self,normalized_flux,normalized_ivar,inf_flux):
         nor = normalized_flux
         inf = inf_flux
@@ -326,10 +331,12 @@ class CannonModel(model.BaseCannonModel):
         # fit
         # It's not good. let's do it one star each time.
 
+        left = np.zeros((3,3))
+        right = np.zeros(3)
+        un = np.zeros((3,3))
+        parameters=np.array([0,1,0])
+        opt_flux = np.ones(n_pixel)
 
-
-        parameters = []
-        opt_flux = []
 
         for p in range(0, n_star):
 
@@ -350,20 +357,57 @@ class CannonModel(model.BaseCannonModel):
 
             y = nor_p.ravel()
             a = np.c_[np.c_[x_data_p.ravel(), y_data_p.ravel()], z_data_p.ravel()]
-            left  = np.dot(np.dot(a.T, c), a)
+
+            left = np.dot(np.dot(a.T, c), a)
             right = np.dot(np.dot(a.T,c), y)
-            parameters_p = np.dot(inv(left), right)
-            print(parameters_p[0], parameters_p[1], parameters_p[2], parameters_p[0] + parameters_p[1] + parameters_p[2])
 
-            opt_flux_p = (parameters_p[0] * x_data + parameters_p[1] * y_data + parameters_p[2] * z_data)
+            un_p = inv(left)
 
-            parameters.append(parameters_p)
-            opt_flux.append(opt_flux_p)
+            parameters_p =np.dot(inv(left), right)
 
-        parameters = np.array(parameters)
-        opt_flux = np.array(opt_flux)
+            opt_flux = np.vstack((opt_flux,parameters_p[0]*x_data_p+parameters_p[1]*y_data_p+parameters_p[2]*z_data_p))
+            parameters = np.vstack((parameters,np.dot(inv(left), right)))
+            un = np.dstack((un,un_p))
+        print("finish fitting")
+        # reshape
+        parameters = parameters[1:(n_star+1),:]
+        opt_flux = opt_flux[1:(n_star + 1), :]
+        un = un[:,:,1:(n_star + 1)]
+        self.uncertainty = un
+
+        # the shape of the uncertainty is 3*3*N
+
+        print(parameters.shape,n_star,opt_flux.shape,un.shape)
 
         return opt_flux,parameters
+
+    # Fit parameters and fiber number by using linear method.
+    # This is for parameters a,b,c
+    # Do not need uncertainty
+    # Infer fiber number
+    def fitting_fiber_number(self,parameters,fiber_number):
+
+        n_star = len(fiber_number)
+
+        """
+        Just try it
+
+        """
+        a = parameters
+        c = np.identity(n_star)
+        y = fiber_number
+
+        left = np.dot(np.dot(a.T, c), a)
+        right = np.dot(np.dot(a.T, c), y)
+        para_p = np.dot(inv(left), right)
+
+        inf_fiber = para_p[0]*parameters[:,0]+para_p[1]*\
+            parameters[:,1]+para_p[2]*parameters[:,2]
+
+        return para_p,inf_fiber
+
+
+
 
 
     def fit(self, normalized_flux, normalized_ivar, initial_labels=None,
