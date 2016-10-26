@@ -16,8 +16,11 @@ import numpy as np
 import scipy.optimize as op
 import os
 from scipy.ndimage import gaussian_filter
+# try to use gnumpy
+#import gnumpy as gpu
 
 from . import (model, utils)
+
 
 logger = logging.getLogger(__name__)
 
@@ -222,22 +225,15 @@ class CannonModel(model.BaseCannonModel):
         n_star = inf[:, 0].size
         one = np.ones(n_star)
 
-        for pixel in range(0, n_pixel):
-            print("Building matrix",pixel,"{:.2f}%".format(pixel/n_pixel*100))
-            if pixel ==0 :
-                x_data = one
-                y_data = inf[:,pixel]
-                z_data = inf[:,pixel+1]
+        # new method for building matrix
+        x_data = np.c_[one,inf]
+        x_data = x_data[:,0:n_pixel]
 
-            elif pixel>0 and pixel < n_pixel-1:
-                x_data = np.c_[x_data,inf[:,pixel-1]]
-                y_data = np.c_[y_data,inf[:,pixel]]
-                z_data = np.c_[z_data,inf[:,pixel+1]]
+        y_data =inf
 
-            elif pixel == n_pixel-1:
-                x_data = np.c_[x_data, inf[:, pixel - 1]]
-                y_data = np.c_[y_data, inf[:, pixel]]
-                z_data = np.c_[z_data, one]
+        z_data = np.c_[inf,one]
+        z_data = z_data[:,1:n_pixel+1]
+
         # fit
         # It's not good. let's do it one star each time.
 
@@ -290,6 +286,79 @@ class CannonModel(model.BaseCannonModel):
         print(parameters.shape,n_star,opt_flux.shape,un.shape)
 
         return opt_flux,parameters
+
+    ##
+    # CUDA version fitting parameters
+    # This is a optimized version of your module.
+    # use gnumpy, use CUDA
+
+    def fitting_spectrum_parameters_single_CUDA(self,nor,ivar,inf):
+        n_pixel = nor[0, :].size
+        n_star = inf[:, 0].size
+        one = np.ones(n_star)
+
+        # new method for building matrix
+        x_data = np.c_[one, inf]
+        x_data = x_data[:, 0:n_pixel]
+
+        y_data = inf
+
+        z_data = np.c_[inf, one]
+        z_data = z_data[:, 1:n_pixel + 1]
+
+        # fit
+        # It's not good. let's do it one star each time.
+
+        left = np.zeros((3, 3))
+        right = np.zeros(3)
+        un = np.zeros((3, 3))
+        parameters = np.array([0, 1, 0])
+        opt_flux = np.ones(n_pixel)
+
+        for p in range(0, n_star):
+
+            x_data_p = x_data[p, :]
+            y_data_p = y_data[p, :]
+            z_data_p = z_data[p, :]
+            nor_p = nor[p, :]
+            ivar_p = ivar[p, :]
+
+            # construct
+            ivar_r = ivar_p.ravel()
+            ni = len(ivar_r)
+            print("calculating parameters", p, "{:.2f}%".format(p / n_star * 100))
+            c = np.zeros((ni, ni))
+
+            for i in range(0, ni):
+                c[i, i] = ivar_r[i]
+
+            y = nor_p.ravel()
+            a = np.c_[np.c_[x_data_p.ravel(), y_data_p.ravel()], z_data_p.ravel()]
+
+            left = np.dot(np.dot(a.T, c), a)
+            right = np.dot(np.dot(a.T, c), y)
+
+            un_p = inv(left)
+
+            parameters_p = np.dot(inv(left), right)
+
+            opt_flux = np.vstack(
+                (opt_flux, parameters_p[0] * x_data_p + parameters_p[1] * y_data_p + parameters_p[2] * z_data_p))
+            parameters = np.vstack((parameters, np.dot(inv(left), right)))
+            un = np.dstack((un, un_p))
+        print("finish fitting")
+        # reshape
+        parameters = parameters[1:(n_star + 1), :]
+        opt_flux = opt_flux[1:(n_star + 1), :]
+        un = un[:, :, 1:(n_star + 1)]
+        self.uncertainty = un
+        self.opt_flux = opt_flux
+
+        # the shape of the uncertainty is 3*3*N
+
+        print(parameters.shape, n_star, opt_flux.shape, un.shape)
+
+        return opt_flux, parameters
 
     # Return delta_chi_squared, which should be bigger than 0
     def delta_chi_squared(self,normalzied_flux,normalized_ivar,inf_flux,Fiber_ID):
