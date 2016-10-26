@@ -200,12 +200,13 @@ The dimension of the Jacobian Matrix is 1*3. To minimize the objective function,
 \[X = [\sum_{n=1}^{n=N}A_n^TC_n^{-1}A]^{-1} \cdot [\sum_{n=1}^{n=N}A^TC_n^{-1}Y_n](7)\]
 \bigskip
 
-By using (7) we can calculate a, b and c. b should be much bigger than both a and c. And a+b+c should be equal to 1.
+By using (7) we can calculate a, b and c. b should be much bigger than both a and c. And a+b+c should be equal to 1. 
 
 
 Calculate the optimized spectrum \( y_{j,n}^{opt}\) by using (3). The Experiment 1 shows that the optimization works.
 \bigskip
 
+In our experiment except calculating $\theta_{j}$, we calculate a, b and c independently for each star, which means N=1 in formula(4)(5)(6)(7).
 
 
 %If the optimization works, we will optimized \(\theta_{j}\) besides a, b and c, which will come soon.
@@ -225,14 +226,8 @@ Calculate the optimized spectrum \( y_{j,n}^{opt}\) by using (3). The Experiment
  \section{\label{sec:level1}Experiment}
  \subsection{\label{sec:level2}Experiment 1}
  
- Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c.
+ Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c for each stars.
  
- The result is \(a+b+c = 0.999\). 
-
-(a,b,c) = (0.078, 0.886, 0.035).
-
-The values of the objective function before and after are 177254 and 174031, which decreases by 2\%.
-
 The labels of the four stars are:
  
  Star A  $T_{eff} =4750$  log g =3.0 $\left[Fe/h\right] =0.15$
@@ -242,6 +237,25 @@ The labels of the four stars are:
  Star C  $T_{eff} =3614$  log g =0.4 $\left[Fe/h\right] =-0.68$
  
  Star D  $T_{eff} =5003$  log g =2.8 $\left[Fe/h\right] =-0.71$
+ 
+ 
+\begin{table}[ht]
+\caption{Fitting results for the four stars}
+\centering
+\begin{tabular}{c c c c c}
+\hline\hline
+Star Name & a & b & c & a+b+c \\ [0.5ex] % inserts table %heading
+\hline
+Star A & 0.121 & 0.824 & 0.052 & 0.998 \\
+Star B & 0.176 & 0.541 &  0.278 & 0.995 \\
+Star C & 0.003 & 1.004 &  -0.007 & 1.000 \\
+Star D & -0.009  & 1.029 & -0.020 & 1.000 \\ [1ex]
+\hline
+\end{tabular}
+\label{table:nonlin}
+\end{table}
+ 
+
  
  
  Then plot the spectrum
@@ -277,6 +291,9 @@ In experiment 1, we use only four stars to obtain parameters a, b and c and the 
 \bigskip
 
 %\includegraphics[width=170mm]{figure_3.png}
+\bigskip
+
+\centerline{Fig.3 Histogram for  a, b and c}
 
 \bigskip
 
@@ -286,7 +303,20 @@ Also. We plot a, b, c against the mean fiber number, which is the average fiber 
 %\includegraphics[width=170mm]{figure_4.png}
 \bigskip
 
+\centerline{Fig.4 a,b,c vs Mean Fiber Number}
+\bigskip
+
 This figure gives us information about the relation between parameters a, b, c and fiber number, which can be used to establish a data-driven spectrum calibration model.
+\bigskip
+
+We also plot delta-chi-squared vs Mean Fiber number, where delta-chi-squared is the difference between the chi-squared of the spectrum before our optimization and after. It should be bigger than 0.
+\bigskip
+
+%\includegraphics[width=170mm]{figure_5.png}
+\bigskip
+
+\centerline{Fig.5 Delta-chi-squared vs Mean Fiber Number}
+\bigskip
 
 
 

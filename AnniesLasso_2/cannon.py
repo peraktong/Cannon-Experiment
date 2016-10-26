@@ -207,102 +207,12 @@ class CannonModel(model.BaseCannonModel):
     @model.requires_training_wheels
 
     # By Jason Cao
-    # Input normalized_flux and normalized)ivar
-    # return optimized_flux, optimized_theta parameters and the variation of the parameters vs star
-    # All of them are np.array
-    def fitting_spectrum_parameters(self,normalized_flux,normalized_ivar,inf_flux):
-        nor = normalized_flux
-        inf = inf_flux
-        ivar = normalized_ivar
-        n_pixel = nor[0, :].size
-        n_star = inf[:, 0].size
-        one = np.ones(n_star)
-
-        for pixel in range(0, n_pixel):
-            print("Building matrix",pixel,"{:.2f}%".format(pixel/n_pixel*100))
-            if pixel ==0 :
-                x_data = one
-                y_data = inf[:,pixel]
-                z_data = inf[:,pixel+1]
-
-            elif pixel>0 and pixel < n_pixel-1:
-                x_data = np.c_[x_data,inf[:,pixel-1]]
-                y_data = np.c_[y_data,inf[:,pixel]]
-                z_data = np.c_[z_data,inf[:,pixel+1]]
-
-            elif pixel == n_pixel-1:
-                x_data = np.c_[x_data, inf[:, pixel - 1]]
-                y_data = np.c_[y_data, inf[:, pixel]]
-                z_data = np.c_[z_data, one]
-        # fit
-        # It's not good. let's do it one star each time.
-
-        left = np.zeros((3,3))
-        right = np.zeros(3)
-
-
-        for p in range(0, n_star):
-
-            x_data_p = x_data[p, :]
-            y_data_p = y_data[p, :]
-            z_data_p = z_data[p, :]
-            nor_p = nor[p, :]
-            ivar_p = ivar[p, :]
-
-            # construct
-            ivar_r = ivar_p.ravel()
-            ni = len(ivar_r)
-            print("calculating parameters",p,"{:.2f}%".format(p/n_star*100))
-            c = np.zeros((ni, ni))
-
-            for i in range(0, ni):
-                c[i, i] = ivar_r[i]
-
-            y = nor_p.ravel()
-            a = np.c_[np.c_[x_data_p.ravel(), y_data_p.ravel()], z_data_p.ravel()]
-            left += np.dot(np.dot(a.T, c), a)
-            right += np.dot(np.dot(a.T,c), y)
-
-        parameters = np.dot(inv(left), right)
-        print(parameters[0],parameters[1],parameters[2],parameters[0]+parameters[1]+parameters[2])
-
-        opt_flux = (parameters[0]*x_data+parameters[1]*y_data+parameters[2]*z_data)
-        #save the optimized spectrum
-
-        # optimize theta
-        theta = self.theta.T
-
-        zero = np.zeros(len(theta[:, 0]))
-        # construct theta_xyz
-
-        for pixel in range(0, n_pixel):
-            print("Building theta matrix", pixel, "{:.2f}%".format(pixel / n_pixel * 100))
-            if pixel == 0:
-                theta_x = zero
-                theta_y = theta[:, pixel]
-                theta_z = theta[:, pixel + 1]
-
-            elif pixel > 0 and pixel < n_pixel - 1:
-                theta_x = np.c_[theta_x, theta[:, pixel - 1]]
-                theta_y = np.c_[theta_y, theta[:, pixel]]
-                theta_z = np.c_[theta_z, theta[:, pixel + 1]]
-
-
-            elif pixel == n_pixel - 1:
-                theta_x = np.c_[theta_x, theta[:, pixel - 1]]
-                theta_y = np.c_[theta_y, theta[:, pixel]]
-                theta_z = np.c_[theta_z, zero]
-
-        theta_opt = parameters[0] * theta_x + parameters[1] * theta_y + parameters[2] * theta_z
-        print(parameters)
-        theta_opt = theta_opt.T
-        return opt_flux,theta_opt,parameters
-
     # return the parameters of each star.
     # Now the uncertainty of parameters is also calculated
     # The structure of the uncertainty is each row is aa,ab,ac ba....
     # so the dimension is 3*3*N, which is a 3 dimension array
     # use self.uncertainty to store
+    # Now the model
 
     def fitting_spectrum_parameters_single(self,normalized_flux,normalized_ivar,inf_flux):
         nor = normalized_flux
@@ -336,7 +246,6 @@ class CannonModel(model.BaseCannonModel):
         un = np.zeros((3,3))
         parameters=np.array([0,1,0])
         opt_flux = np.ones(n_pixel)
-
 
         for p in range(0, n_star):
 
@@ -374,12 +283,38 @@ class CannonModel(model.BaseCannonModel):
         opt_flux = opt_flux[1:(n_star + 1), :]
         un = un[:,:,1:(n_star + 1)]
         self.uncertainty = un
+        self.opt_flux = opt_flux
 
         # the shape of the uncertainty is 3*3*N
 
         print(parameters.shape,n_star,opt_flux.shape,un.shape)
 
         return opt_flux,parameters
+
+    # Return delta_chi_squared, which should be bigger than 0
+    def delta_chi_squared(self,normalzied_flux,normalized_ivar,inf_flux,Fiber_ID):
+        opt_flux = self.opt_flux
+        N_star = len(Fiber_ID)
+        delta_chi = []
+
+        for p in range(0, N_star):
+            ivar_r = normalized_ivar[p, :]
+            ni = len(ivar_r)
+
+            c = np.zeros((ni, ni))
+            print("Calculating delta-chi-squared",p,"{:.2f}%".format(p/N_star*100))
+
+            for i in range(0, ni):
+                c[i, i] = ivar_r[i]
+
+            # correct chi-squared
+            a_old = np.dot(np.dot(normalzied_flux[p, :] - inf_flux[p, :], c), (normalzied_flux[p, :] - inf_flux[p, :]).T)
+            a_opt = np.dot(np.dot(normalzied_flux[p, :] - opt_flux[p, :], c), (normalzied_flux[p, :] - opt_flux[p, :]).T)
+            delta_p = a_old-a_opt
+            delta_chi.append(delta_p)
+        delta_chi = np.array(delta_chi)
+
+        return delta_chi
 
     # Fit parameters and fiber number by using linear method.
     # This is for parameters a,b,c
