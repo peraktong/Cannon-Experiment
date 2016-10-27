@@ -7,6 +7,18 @@ from astropy.io import fits
 import pickle
 import matplotlib.pyplot as plt
 import matplotlib
+import os
+import numpy as np
+from astropy.table import Table
+from astropy.io import fits
+
+import pickle
+import matplotlib.pyplot as plt
+import matplotlib
+from astropy.io.fits import getdata
+
+import AnniesLasso_2 as tc
+
 
 
 # function
@@ -19,17 +31,15 @@ def get_pixmask(flux, err):
 # read data
 all_set = Table.read("/Users/caojunzhi/Desktop/NYU/Laboratory/task 2016.8.1-12.23/My codes/Cannon Experiment python 3.5/allStar-v304.fits")
 
-# data
-all_set_flux = []
-all_set_ivar = []
-all_set_error = []
-test_labels_all = []
 
+
+
+"""
 # choose some of them
 choose = []
 a=0
-for i in range(0,800):
-    a += np.random.randint(1,70)
+for i in range(0,1000):
+    a += np.random.randint(1,55)
     choose.append(a)
 
 choose = np.array(choose)
@@ -37,11 +47,23 @@ all_set = all_set[choose]
 
 
 # save the chosen star
-output = open('choose_800.pkl', 'wb')
+output = open('choose_500.pkl', 'wb')
 pickle.dump(choose, output)
 output.close()
 
+"""
+# open the chosen star
+pkl_file = open('choose_500.pkl', 'rb')
+choose = pickle.load(pkl_file)
+pkl_file.close()
 
+all_set = all_set[choose]
+
+# data
+all_set_flux = []
+all_set_ivar = []
+all_set_error = []
+test_labels_all = []
 N = len(all_set)
 keep = np.ones(N, dtype=bool)
 tr_ID = []
@@ -90,9 +112,6 @@ for i, row in enumerate(all_set):
         # Fiber number
         m = dat[0]["FIBER"]
         m =np.array(m)
-
-        print(m)
-        print(type(m))
 
         try:
             FiberID.append(sum(m) / len(m))
@@ -154,31 +173,6 @@ cont = ds.fit_continuum(3, "sinusoid")
 # Obtain the normalized flux
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
     ds.continuum_normalize(cont)
-
-#Let's plot them
-
-p = np.random.randint(0,len(norm_tr_flux[:,0])-1)
-
-font = {'weight': 'bold','size': 13}
-matplotlib.rc('font', **font)
-fig = plt.figure()
-
-
-plt.plot(wl,tr_flux[p,:],"k",label="data")
-plt.plot(wl,norm_tr_flux[p,:],"r",label = "nor")
-
-axes = plt.gca()
-#axes.set_xlim([15660,15780])
-axes.set_xlim([16160,16280])
-axes.set_ylim([0.8,1.21])
-axes.set_yticks(np.arange(0.8,1.21,0.1))
-
-plt.legend(loc="best")
-plt.xlabel('reference labels', fontsize=18)
-plt.ylabel('inferred labels', fontsize=18)
-
-plt.show()
-
 # save the testing set
 
 
@@ -201,7 +195,7 @@ output.close()
 
 
 output = open('nor_testing_flux_500.pkl', 'wb')
-pickle.dump(norm_tr_flux, output)
+pickle.dump(norm_test_flux, output)
 output.close()
 
 
@@ -210,12 +204,139 @@ pickle.dump(tr_ivar, output)
 output.close()
 
 output = open('nor_testing_ivar_500.pkl', 'wb')
-pickle.dump(norm_tr_ivar, output)
+pickle.dump(norm_test_ivar, output)
 output.close()
 
 output = open('FiberID.pkl', 'wb')
 pickle.dump(FiberID, output)
 output.close()
+
+#####################################
+# Then Let's do it one by one
+
+# training
+training_set_path = "/Users/caojunzhi/Desktop/NYU/Laboratory/task 2016.8.1-12.23/My codes/Cannon Experiment python 3.5/reference_labels.csv"
+training_set_spectrum_dir = "/Users/caojunzhi/Desktop/NYU/Laboratory/task 2016.8.1-12.23/My codes/Cannon Experiment python 3.5/Data/"
+
+
+training_set = Table.read("reference_labels.csv")
+
+
+
+def get_pixmask(flux, err):
+    bad_flux = ~np.isfinite(flux)
+    bad_err = (~np.isfinite(err)) | (err <= 0)
+    bad_pixels = bad_err | bad_flux
+    return bad_pixels
+
+
+N = len(training_set)
+keep = np.ones(N, dtype=bool)
+
+training_set_flux = []
+training_set_ivar = []
+training_set_error = []
+for i, row in enumerate(training_set):
+
+    image_path = os.path.join(training_set_spectrum_dir, row["ID"])
+
+    if not os.path.exists(image_path):
+        print("{}/{} could not be found: {}".format(i + 1, N, image_path))
+        keep[i] = False
+        continue
+
+    print("{}/{}: {}".format(i + 1, N, image_path))
+
+    image = fits.open(image_path)
+
+    flux = image[1].data
+    flux_err = image[2].data
+
+    badpix = get_pixmask(flux, flux_err)
+    ivar = 1.0/flux_err**2
+    error = flux_err
+    # badpix is a array and the length is 8575
+    flux[badpix] = 1.0
+    ivar[badpix] = 0.0
+
+    training_set_flux.append(flux)
+    training_set_ivar.append(ivar)
+    training_set_error.append(error)
+
+training_set_flux = np.array(training_set_flux)
+training_set_ivar = np.array(training_set_ivar)
+training_set_error = np.array(training_set_error)
+
+
+assert all(keep)
+
+# Construct model.
+model = tc.L1RegularizedCannonModel(
+    training_set, training_set_flux, training_set_ivar,threads=8)
+model.s2 = 0
+model.regularization = 0
+model.vectorizer = tc.vectorizer.NormalizedPolynomialVectorizer(training_set,
+    tc.vectorizer.polynomial.terminator(("Teff_{corr}", "logg_{corr}", "[M/H]_{corr}"), 2))
+
+model.train()
+
+########################
+# optimize the spectrum
+
+inf_label_500 = model.fit(norm_test_flux,norm_test_ivar)
+
+v_500 = model.vectorizer.get_label_vector(inf_label_500)
+# v_500 = model.vectorizer.get_label_vector(test_label)
+
+inf_flux_500 = np.dot(v_500,model.theta.T)
+
+
+opt_flux_500,parameters_500 = model.fitting_spectrum_parameters_single(norm_test_flux,norm_test_ivar,inf_flux_500)
+
+
+#check
+print("check")
+print(opt_flux_500.shape,inf_flux_500.shape,FiberID.shape,parameters_500.shape)
+
+
+###################
+# Let's plot:
+
+colors = ['b', 'g', 'r']
+name = ["a","b","c"]
+
+# Plot histogram
+plt.hist(parameters_500,bins=20,stacked=True,color=colors,label=name)
+plt.legend(prop={'size': 10})
+plt.suptitle('Histogram of parameters a,b and c')
+plt.xlabel('values of a, b and c', fontsize=20)
+plt.ylabel('number of stars', fontsize=20)
+
+plt.show()
+
+
+
+# plot the parameters vs metadata
+
+
+font = {'weight': 'bold','size': 30}
+matplotlib.rc('font', **font)
+fig = plt.figure()
+
+plt.plot(FiberID,parameters_500[:,0], "bo", label="a", linewidth=3.0)
+plt.plot(FiberID,parameters_500[:,1], "go", label="b", linewidth=3.0)
+plt.plot(FiberID,parameters_500[:,2], "ro", label="c", linewidth=3.0)
+
+plt.legend(loc="best")
+
+fig.suptitle('a, b, c against mean fiber number', fontsize=40)
+plt.xlabel('fiber number', fontsize=38)
+plt.ylabel('parameters a, b, c', fontsize=36)
+plt.show()
+
+
+
+
 
 
 
