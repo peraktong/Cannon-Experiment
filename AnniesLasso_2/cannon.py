@@ -210,6 +210,74 @@ class CannonModel(model.BaseCannonModel):
     @model.requires_training_wheels
 
     # By Jason Cao
+
+
+    def fitting_spectrum_parameters(self,normalized_flux,normalized_ivar,inf_flux):
+        nor = normalized_flux
+        inf = inf_flux
+        ivar = normalized_ivar
+        n_pixel = nor[0, :].size
+        n_star = inf[:, 0].size
+        one = np.ones(n_star)
+
+        # new method for building matrix
+        x_data = np.c_[one,inf]
+        x_data = x_data[:,0:n_pixel]
+
+        y_data =inf
+
+        z_data = np.c_[inf,one]
+        z_data = z_data[:,1:n_pixel+1]
+
+        # fit
+        # It's not good. let's do it one star each time.
+
+        left = np.zeros((3,3))
+        right = np.zeros(3)
+
+        for p in range(0, n_star):
+
+            x_data_p = x_data[p, :]
+            y_data_p = y_data[p, :]
+            z_data_p = z_data[p, :]
+            nor_p = nor[p, :]
+            ivar_p = ivar[p, :]
+
+            # construct
+            ivar_r = ivar_p.ravel()
+            ni = len(ivar_r)
+            print("calculating parameters",p,"{:.2f}%".format(p/n_star*100))
+            c = np.zeros((ni, ni))
+
+            for i in range(0, ni):
+                c[i, i] = ivar_r[i]
+
+            y = nor_p.ravel()
+            a = np.c_[np.c_[x_data_p.ravel(), y_data_p.ravel()], z_data_p.ravel()]
+
+            left += np.dot(np.dot(a.T, c), a)
+            right += np.dot(np.dot(a.T,c), y)
+
+        parameters = np.dot(inv(left), right)
+        opt_flux = parameters[0]*x_data+parameters[1]*y_data+parameters[2]*z_data
+        print("finish fitting")
+
+        # build theta:
+        zero = np.ones(n_pixel)
+
+        theta_x = np.c_[zero,self.theta]
+        theta_x = x_data[:,0:n_pixel]
+
+        theta_y =inf
+
+        theta_z = np.c_[self.theta,zero]
+        theta_z = z_data[:,1:n_pixel+1]
+
+        theta_opt = parameters[0]*theta_x+parameters[1]*theta_y+parameters[2]*theta_z
+
+        return opt_flux,theta_opt,parameters
+
+
     # return the parameters of each star.
     # Now the uncertainty of parameters is also calculated
     # The structure of the uncertainty is each row is aa,ab,ac ba....
@@ -513,7 +581,7 @@ class CannonModel(model.BaseCannonModel):
         inferred_labels = self.fit_labelled_set()
         inf = np.dot(self.theta, self.vectorizer(inferred_labels).T).T
 
-        inferred_flux_opt,theta_opt,parameters = self.fitting_spectrum_parameters(normalized_flux,normalized_ivar,inf)
+        opt_flux,theta_opt,parameters = self.fitting_spectrum_parameters(normalized_flux,normalized_ivar,inf)
 
         f = utils.wrapper(_fit_spectrum,
                           (self.dispersion, initial_labels, self.vectorizer, theta_opt,
