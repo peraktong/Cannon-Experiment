@@ -355,6 +355,95 @@ class CannonModel(model.BaseCannonModel):
 
         return opt_flux,parameters
 
+
+    def fitting_spectrum_parameters_single_5(self,normalized_flux,normalized_ivar,inf_flux):
+        nor = normalized_flux
+        inf = inf_flux
+        ivar = normalized_ivar
+        n_pixel = nor[0, :].size
+        n_star = inf[:, 0].size
+        one = np.ones(n_star)
+
+        # new method for building matrix
+        l_1 = np.c_[one,inf]
+        l_1 = l_1[:,0:n_pixel]
+
+        l_2 = np.c_[one,l_1]
+        l_2 = l_2[:, 0:n_pixel]
+
+
+        m_0 =inf
+
+        r_1 = np.c_[inf,one]
+        r_1 = r_1[:,1:n_pixel+1]
+
+        r_2 = np.c_[r_1,one]
+        r_2 = r_2[:, 1:n_pixel + 1]
+
+        # fit
+        # It's not good. let's do it one star each time.
+
+        un = np.zeros((5,5))
+        parameters=np.array([0,0,0,0,0])
+        opt_flux = np.ones(n_pixel)
+
+        for p in range(0, n_star):
+
+            l_2_p =l_2[p,:]
+            l_1_p = l_1[p, :]
+            m_0_p = m_0[p, :]
+            r_1_p = r_1[p, :]
+            r_2_p = r_2[p, :]
+
+
+            nor_p = nor[p, :]
+            ivar_p = ivar[p, :]
+
+            # construct
+            ivar_r = ivar_p.ravel()
+            ni = len(ivar_r)
+            print("calculating parameters_5",p,"{:.2f}%".format(p/n_star*100))
+            c = np.zeros((ni, ni))
+
+            for i in range(0, ni):
+                c[i, i] = ivar_r[i]
+
+            y = nor_p.ravel()
+
+            a = np.c_[np.c_[l_2_p.ravel(), l_1_p.ravel()], m_0_p.ravel()]
+            a = np.c_[a,r_1_p.ravel()]
+            a = np.c_[a,r_2_p.ravel()]
+
+
+
+
+            left = np.dot(np.dot(a.T, c), a)
+            right = np.dot(np.dot(a.T,c), y)
+
+            un_p = inv(left)
+
+            parameters_p =np.dot(inv(left), right)
+
+            opt_flux = np.vstack((opt_flux,parameters_p[0]*l_2_p+parameters_p[1]*l_1_p+parameters_p[2]*m_0_p
+                                  +parameters_p[3]*r_1_p+parameters_p[4]*r_2_p))
+            parameters = np.vstack((parameters,np.dot(inv(left), right)))
+            un = np.dstack((un,un_p))
+        print("finish fitting 5 parameters")
+        # reshape
+        parameters = parameters[1:(n_star+1),:]
+        opt_flux = opt_flux[1:(n_star + 1), :]
+        un = un[:,:,1:(n_star + 1)]
+        self.uncertainty = un
+        self.opt_flux = opt_flux
+
+        # the shape of the uncertainty is 3*3*N
+
+        print(parameters.shape,n_star,opt_flux.shape,un.shape)
+
+        return opt_flux,parameters
+
+
+
     ##
     # CUDA version fitting parameters
     # This is a optimized version of your module.
@@ -453,30 +542,9 @@ class CannonModel(model.BaseCannonModel):
 
         return delta_chi
 
-    # Fit parameters and fiber number by using linear method.
-    # This is for parameters a,b,c
-    # Do not need uncertainty
-    # Infer fiber number
-    def fitting_fiber_number(self,parameters,fiber_number):
 
-        n_star = len(fiber_number)
 
-        """
-        Just try it
 
-        """
-        a = parameters
-        c = np.identity(n_star)
-        y = fiber_number
-
-        left = np.dot(np.dot(a.T, c), a)
-        right = np.dot(np.dot(a.T, c), y)
-        para_p = np.dot(inv(left), right)
-
-        inf_fiber = para_p[0]*parameters[:,0]+para_p[1]*\
-            parameters[:,1]+para_p[2]*parameters[:,2]
-
-        return para_p,inf_fiber
 
 
 
