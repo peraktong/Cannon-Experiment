@@ -302,6 +302,10 @@ class CannonModel(model.BaseCannonModel):
         z_data = np.c_[inf,one]
         z_data = z_data[:,1:n_pixel+1]
 
+        self.x_data =x_data
+        self.y_data =y_data
+        self.z_data =z_data
+
         # fit
         # It's not good. let's do it one star each time.
 
@@ -339,7 +343,8 @@ class CannonModel(model.BaseCannonModel):
             parameters_p =np.dot(inv(left), right)
 
             opt_flux = np.vstack((opt_flux,parameters_p[0]*x_data_p+parameters_p[1]*y_data_p+parameters_p[2]*z_data_p))
-            parameters = np.vstack((parameters,np.dot(inv(left), right)))
+            parameters = np.vstack((parameters,parameters_p))
+            print(parameters_p)
             un = np.dstack((un,un_p))
         print("finish fitting")
         # reshape
@@ -518,9 +523,9 @@ class CannonModel(model.BaseCannonModel):
         return opt_flux, parameters
 
     # Return delta_chi_squared, which should be bigger than 0
-    def delta_chi_squared(self,normalzied_flux,normalized_ivar,inf_flux,Fiber_ID):
+    def delta_chi_squared(self,normalzied_flux,normalized_ivar,inf_flux):
         opt_flux = self.opt_flux
-        N_star = len(Fiber_ID)
+        N_star = len(inf_flux[:,0])
         delta_chi = []
 
         for p in range(0, N_star):
