@@ -213,10 +213,10 @@ Calculate the optimized spectrum \( y_{j,n}^{opt}\) by using (3). The Experiment
 
 \subsection{\label{sec:level2}Spectrum calibration}
 \bigskip
-After the optimization, we obtain many sets of a, b and c. In our theory b should be close to 1 and a, c is much smaller than b. But the fact is that sometimes b is close to -1. This is because of the spectral broadening in the measurement. The equipment is not perfect, so the resolution of the spectrum will become lower due to scattering, dispersion or other reasons. Then the spectrum will broaden and the real spectrum at pixel j is not what we obtain, it should be the spectrum at nearby pixels, which include pixel j-1 and j+1. Thus b will be close to -1 and at the same time a and c should be close to 1, which we will check in experiment 3.
+After the optimization, we obtain many sets of a, b and c. In our theory b should be close to 1 and a, c is much smaller than b. But the fact is that sometimes b is much smaller than and c. This is because of the spectral broadening in the measurement. The equipment is not perfect, so the resolution of the spectrum will become lower due to scattering, dispersion or other reasons. Then the spectrum will broaden and the real spectrum at pixel j is not what we obtain, it should be the spectrum at nearby pixels, which include pixel j-1 and j+1. Thus b will be smaller than a+c, which we will discuss in the following experiment 3.
 \bigskip
 
-Sometimes a or c will be close to 1. This is also because of the measurement. Even we ignore the spectral broadening, the measured spectrum may move one pixel left or one pixel right from the real spectrum. If the measured spectrum move one pixel left, then a should be close to 1 and it's similar for c. The measured spectrum moves left or right is because of the error in the measured velocity, so there will be error in measuring the Doppler effect, which leads to a spectrum moving. We will show this in experiment 4.
+Sometimes a or c will be much bigger than the other two parameters. This is also because of the measurement. Even we ignore the spectral broadening, the measured spectrum may move one pixel left or one pixel right from the real spectrum. If the measured spectrum move one pixel left, then a should be close to 1 and it's similar for c. The measured spectrum moves left or right is because of the error in the measured velocity, so there will be error in measuring the Doppler effect, which leads to a spectrum moving. We will show this in experiment 3.
 \bigskip
 
 
@@ -232,7 +232,7 @@ Working on it...
  \section{\label{sec:level1}Experiment}
  \subsection{\label{sec:level2}Experiment 1}
  
- Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c for each stars.
+Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c for each stars.
  
 The labels of the four stars are:
 \begin{center}
@@ -296,7 +296,7 @@ The total chi-squared of the four stars becomes 2\% smaller, which means our met
  Plot the parameters a, b and c vs the number of the star. 
  \bigskip
  
-In experiment 1, we use only four stars to obtain parameters a, b and c and the result is pretty good.  What if we optimize more stars? We randomly choose about 1\% of the APOGEE DR10 and make a histogram plot. The number of stars is 907. Now parameters a, b and c are obtained from independent stars, which means the objective function only contain the chi-squared of one star and there will be 907 objective functions. And there will be 907 sets of a, b and c. 
+In experiment 1, we use only four stars to obtain parameters a, b and c and the result is pretty good.  What if we optimize more stars? We randomly choose about 1\% of the APOGEE DR10 and make a histogram plot. The number of stars is 614. Now parameters a, b and c are obtained from independent stars, which means the objective function only contain the chi-squared of one star and there will be 614 objective functions. And there will be 614 sets of a, b and c. 
 
 
 We plot a, b, c against the mean fiber number, which is the average fiber number of the spectrum we optimize. In APOGEE DR 10, the fiber number is between 1 and 640. The parameters we use are from figure 3
@@ -322,7 +322,7 @@ We also plot delta-chi-squared vs Mean Fiber number, where delta-chi-squared is 
 \subsection{\label{sec:level2}Experiment 3}
 
 \bigskip
-Now choose some examples from the 907 stars and make some plots.
+Now choose some examples from the 614 stars and make some plots.
 
 
 First, plot the four stars with biggest delta-chi-squared and smallest delta-chi-squared:
@@ -330,14 +330,18 @@ First, plot the four stars with biggest delta-chi-squared and smallest delta-chi
 \includegraphics[width=170mm]{figure_5.png}
 \bigskip
 
-\centerline{Fig.5 Spectrum of the four stars with biggest delta-chi-squared}
+\centerline{Fig.5 Spectrum of the four stars with biggest delta-chi-squared. }
+
+\centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
 
 \includegraphics[width=170mm]{figure_6.png}
 \bigskip
 
-\centerline{Fig.6 Spectrum of the four stars with smallest delta-chi-squared}
+\centerline{Fig.6 Spectrum of the four stars with smallest delta-chi-squared. }
+
+\centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
 From figure 6 and 7, we find that the four stars with smallest delta-chi-squared have b closer to 1, but the four stars with biggest delta-chi-squared don't.
@@ -349,25 +353,29 @@ Plot four stars with b closest to 1:
 \includegraphics[width=170mm]{figure_7.png}
 \bigskip
 
-\centerline{Fig.7 Spectrum of the four stars with b closest to 1}
+\centerline{Fig.7 Spectrum of the four stars with b closest to 1. }
+
+\centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
-From the histogram of a, b and c, we also find that sometimes b becomes -1, which means the spectrum is broadened due to the measurement. The resolution of the spectrum becomes lower and this is what we want to calibrate.
+From the histogram of a, b and c, we also find that sometimes b becomes much smaller than a+c, which means the spectrum is broadening due to the measurement. The resolution of the spectrum becomes lower and this is what we want to calibrate.
 \bigskip
-Here is the plot of the four stars with b closest to -1:
+Here is the plot of the four stars with biggest a+c-b:
 \bigskip
 
 \includegraphics[width=170mm]{figure_8.png}
 \bigskip
 
-\centerline{Fig.8 Spectrum of the four stars with b closest to -1}
+\centerline{Fig.8 Spectrum of the four stars with biggest a+c-b. }
+
+\centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
 
 \bigskip
 
 We found a and c are close to 1, which is in accordance with our theory. 
-Also, the optimized spectrum broaden when b =-1, which means the measured spectrum broaden due to the error in the measurement. This is what we need to calibrate.
+Also, the optimized spectrum broaden when a+c is much bigger than b, which means the measured spectrum broaden due to the error in the measurement. This is what we need to calibrate.
 \bigskip
 
 To look deeper into the results, we also choose the four stars with biggest $a-c$ and biggest $c-a$. Then make another two plots:
@@ -376,7 +384,9 @@ To look deeper into the results, we also choose the four stars with biggest $a-c
 \includegraphics[width=170mm]{figure_9.png}
 \bigskip
 
-\centerline{Fig.9 Spectrum of the four stars with biggest $a-c$}
+\centerline{Fig.9 Spectrum of the four stars with biggest $a-c$.}
+
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
 
@@ -386,7 +396,9 @@ To look deeper into the results, we also choose the four stars with biggest $a-c
 \includegraphics[width=170mm]{figure_10.png}
 \bigskip
 
-\centerline{Fig.10 Spectrum of the four stars with biggest $c-a$}
+\centerline{Fig.10 Spectrum of the four stars with biggest $c-a$.}
+
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
 For spectrum with $a>c$, the optimized spectrum moves right a little bit, which means the real spectrum should move left a little. It's similar for $c>a$
@@ -409,6 +421,20 @@ We also plot $Teff$ against log g. The color bar shows the mean inverse variance
  \section{\label{sec:level1}Discussion}
  
  Coming soon.
+ 
+  %% Fifth paragraph
+
+ \section{\label{sec:level1}Appendix}
+ 
+ 
+ Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
+
+
+\includegraphics[width=170mm]{d_figure_2.png}
+\bigskip
+
+\centerline{Fig.2 Histogram of a b c for apstar data (What we use now)}
+\bigskip
 
 
 

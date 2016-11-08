@@ -16,11 +16,24 @@ def get_pixmask(flux, err):
     bad_pixels = bad_err | bad_flux
     return bad_pixels
 
+def get_error_mask(err):
+    bad_err = (~np.isfinite(err))
+    bad_pixels = bad_err
+    return bad_pixels
+
 # read data
 all_set = Table.read("/Users/caojunzhi/Desktop/NYU/Laboratory/task 2016.8.1-12.23/My codes/Cannon Experiment python 3.5/allStar-v304.fits")
 
 # data
 
+
+## 1. read the dat
+## 2. add a mask (bitmask)
+## 3. filter-mean inverse variance
+
+
+
+# Try to use numpy array to avoid memory overflow
 all_set_flux = np.zeros(8575)
 all_set_ivar = np.zeros(8575)
 all_set_error = np.zeros(8575)
@@ -29,8 +42,8 @@ all_set_error = np.zeros(8575)
 # choose some of them
 choose = []
 a=0
-for i in range(0,1600):
-    a += np.random.randint(1,30)
+for i in range(0,3200):
+    a += np.random.randint(1,11)
     choose.append(a)
 
 choose = np.array(choose)
@@ -99,6 +112,7 @@ for i, row in enumerate(all_set):
             all_set_error = np.vstack((all_set_error, error))
             test_labels_all_i = [row["TEFF"], row["LOGG"], row["METALS"]]
             test_labels_all.append(test_labels_all_i)
+            print(test_labels_all_i)
             choose_800_final.append(i)
 
 
@@ -186,8 +200,21 @@ keep = np.ones(star, dtype=bool)
 
 for i in range(0,star):
     ivar = norm_tr_ivar[i,:]
+    print(ivar)
     if np.mean(ivar) > 10000 and np.mean(ivar) < 40000:
-        keep[i]=1
+
+## If the labels are not obtained, APOGEE will set them as -10000
+##  So exclude these labels
+        teff = test_labels_all[i,0]
+        logg = test_labels_all[i,1]
+        metal = test_labels_all[i,2]
+        if teff>0 and logg> -15 and metal > -15:
+            keep[i] = 1
+        else:
+            keep[i] = 0
+            star -= 1
+            fail += 1
+
 
     else:
         keep[i] = 0
@@ -202,6 +229,13 @@ norm_ivar =norm_test_ivar[keep]
 # normalize the error
 all_set_error = all_set_error[keep]
 norm_error = all_set_error*all_set_flux[keep]/norm_flux
+# remember to exclude infinite errors because they are not infinite! (See your note)
+print("set wrong error to 0")
+badpix = get_error_mask(norm_error)
+norm_error[badpix]=0
+
+
+
 
 test_labels_all =test_labels_all[keep]
 tr_ID = tr_ID[keep]
@@ -275,8 +309,8 @@ matplotlib.rc('font', **font)
 fig = plt.figure()
 
 
-plt.plot(wl,tr_flux[p,:],"k",label="data")
-plt.plot(wl,norm_tr_flux[p,:],"r",label = "nor")
+
+plt.plot(wl,norm_flux[p,:],"r",label = "nor")
 
 axes = plt.gca()
 #axes.set_xlim([15660,15780])
@@ -287,6 +321,7 @@ axes.set_yticks(np.arange(0.8,1.21,0.1))
 plt.legend(loc="best")
 plt.xlabel('reference labels', fontsize=18)
 plt.ylabel('inferred labels', fontsize=18)
+plt.show()
 
 
 
