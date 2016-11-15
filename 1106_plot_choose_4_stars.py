@@ -18,11 +18,6 @@ import plot_class_4_star_v2_1107
 
 
 
-
-
-
-
-
 # import data
 pkl_file = open('n_delta_chi_900.pkl', 'rb')
 delta_chi_500 = pickle.load(pkl_file)

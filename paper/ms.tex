@@ -226,7 +226,8 @@ We will do this optimization for each visit of every star in APOGEE DR10. The sp
 \subsection{\label{sec:level2}Optimize Teff , log g and [Fe/H] simultaneously with a, b, c}
 
 Working on it...
-
+I think one possible way is to use the velocities correction for the APOGEE data obtained from the spectrum calibration section. Then the optimized APOGEE spectrum can be represented as:
+You should look into the velocities and find a right way to describe them.
 
 
 %% Third paragraph
@@ -234,7 +235,7 @@ Working on it...
  \section{\label{sec:level1}Experiment}
  \subsection{\label{sec:level2}Experiment 1}
  
-Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c for each stars. The labels we use are from the Cannon, which means they are inferred labels.
+Choose four stellar, which are not in the training set. Optimize the spectrum of these four stars and obtain a, b and c for each stars. The labels we use in the figures are from the Cannon, which means they are inferred labels.
  
 The labels of the four stars are:
 \begin{center}
@@ -320,7 +321,8 @@ We also plot delta-chi-squared vs Mean Fiber number, where delta-chi-squared is 
 \subsection{\label{sec:level2}Experiment 3}
 
 \bigskip
-Now choose some examples from the 614 stars and make some plots.
+Now choose some examples from the 614 stars and make some plots.Sometimes the inferred spectrum doesn't look like the data, which is already described in Ness et al 2015. We don't use these stars in the plots.
+
 
 
 First, plot the four stars with biggest delta-chi-squared and smallest delta-chi-squared:
@@ -399,12 +401,12 @@ To look deeper into the results, we also choose the four stars with biggest $a-c
 \centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 \bigskip
 
-For spectrum with $a>c$, the optimized spectrum moves right a little bit, which means the real spectrum should move left a little. It's similar for $c>a$
+For spectrum with $a>c$, the optimized spectrum moves left a little bit, which means the real spectrum should move right a little. It's similar for $c>a$. The c>a branch is not as obvious as the a>c branch.
 
 \subsection{\label{sec:level2}Experiment 4}
 
 \bigskip
-We also plot $Teff$ against log g. The color bar shows the mean inverse variance of these stars.
+We also plot the inferred labels $Teff$ against log g. The color bar shows the mean inverse variance of these stars.
 
 \includegraphics[width=170mm]{figure_10.png}
 \bigskip
