@@ -434,88 +434,55 @@ We also plot the inferred labels $Teff$ against log g. The color bar shows the m
 \includegraphics[width=170mm]{d_figure_1.png}
 \bigskip
 
-\centerline{Fig.1 Histogram of a b c for apstar data (What we use now)}
+\centerline{Diagnostic Fig.1 Histogram of a b c for apstar data (What we use now)}
 \bigskip
 
- 
- 
-Plot log g vs teff for all the stars we use in the training step.
+
+
+Comparison of the spectrum if we set the parameters showed in old figure 8. In old figure 8, the red line and the green line are on the top of each other
+ \bigskip
 
 
 \includegraphics[width=170mm]{d_figure_2.png}
 \bigskip
 
-\centerline{Fig.2 Log g vs Teff for the training set}
+\centerline{Diagnostic Fig.2 Comparison of the spectrum if we set the parameters showed in old figure 8}
 \bigskip
 
-
-Randomly choose four stars and manually set their a, b and c equal to parameters in figure 8, then plot the spectrum. The difference between a and c is about 0.3.
+Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
+ \bigskip
+ 
+ 
+ Comparison of the spectrum if we set the parameters showed in old figure 9. In old figure 9, the difference between red line and the green line is too big if we consider their parameters.
+ \bigskip
 
 
 \includegraphics[width=170mm]{d_figure_3.png}
 \bigskip
 
-\centerline{Fig.3 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
+\centerline{Diagnostic Fig.3 Comparison of the spectrum if we set the parameters showed in old figure 9}
 \bigskip
 
-Randomly choose four stars and manually set a = 0.7 b = 0.2 c = 0.1, then plot the spectrum. The difference between a and c is 0.6.
-
+Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
+ \bigskip
+ 
+ 
+ If we want a plot like old figure 9, we can manually set a=0.5, b=1 and c= -0.5. Here a+b+c is not equal to 1 and this is the cause of the offset.
+ \bigskip
 
 
 \includegraphics[width=170mm]{d_figure_4.png}
 \bigskip
 
-\centerline{Fig.4 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
+\centerline{Diagnostic Fig.4 Comparison of the spectrum if we want a big difference between the red line and the green line}
 \bigskip
 
-Randomly choose four stars and manually set a = 2 b = -2 c = 1, then plot the spectrum. The difference between a and c is 1.
+Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
+ \bigskip
 
 
-\includegraphics[width=170mm]{d_figure_5.png}
-\bigskip
 
-\centerline{Fig.5 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
-\bigskip
-
-
-Diagnostic. The parameters showed in figure 6 are the parameters obtained from the optimization process using labels from the APOGEE team, which is not correct. But the parameters to generate optimized flux are from the optimization process using labels from the Cannon, which should be correct.
-
-
-\includegraphics[width=170mm]{d_figure_6.png}
-\bigskip
-
-\centerline{Fig.6 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
-\bigskip
-
-Diagnostic. If using the old parameters, the plot should looks like figure 7. There will be a big different between the red line and the green line.
-
-
-\includegraphics[width=170mm]{d_figure_7.png}
-\bigskip
-
-\centerline{Fig.7 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
-\bigskip
-
-Diagnostic. This is what the old figure 10 looked like. There isn't a big different between the red line and the green line. This parameter set is wrong.
-
-
-\includegraphics[width=170mm]{d_figure_8.png}
-\bigskip
-
-\centerline{Fig.8 Comparison of the spectrum}
-
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized }
-\bigskip
+ 
 
 
 
