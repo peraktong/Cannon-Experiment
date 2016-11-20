@@ -226,8 +226,11 @@ We will do this optimization for each visit of every star in APOGEE DR10. The sp
 \subsection{\label{sec:level2}Optimize Teff , log g and [Fe/H] simultaneously with a, b, c}
 
 Working on it...
-I think one possible way is to use the velocities correction for the APOGEE data obtained from the spectrum calibration section. Then the optimized APOGEE spectrum can be represented as:
-You should look into the velocities and find a right way to describe them.
+
+To optimize the inferred labels, we can add a, b and c to the training set labels. First, calculate a, b and c for the 548 training set stars. Then, treat these a b and c as three new labels and re-train this new six-label model with these stars. After the training step, infer labels (Which we call optimized inferred labels) by using the new model and compare the results with the old inferred labels.
+The advantage of this change is that the model becomes better without adding new labels. This is a pure data-driven model.
+
+We will introduce this in Experiment 5.
 
 
 %% Third paragraph
@@ -413,6 +416,45 @@ We also plot the inferred labels $Teff$ against log g. The color bar shows the m
 
 \centerline{Fig.10 $Teff$ vs $log g$}
 \bigskip
+
+
+\subsection{\label{sec:level2}Experiment 5}
+
+Optimize the inferred labels by using the new model, which include a, b and c in the training set. First, we obtain a b and c for the 548 stars in the training set, then treat them as three new labels. After that, we train this new six-label model with these 548 stars.
+\bigskip
+
+To check whether this change works, we infer labels for the 614 stars in Experiment 2 by using two methods. The first method is to infer labels with the old model, which has three labels $Teff$, $Log g $ and $Fe/H$. We call the inferred labels from the old model as $inf_{label}^{old}$.
+
+The second method is to generate labels by using the new six-label ($Teff$, $Log g $, $Fe/H$, $a$, $b$ and $c$) model and we call these inferred labels as $inf_{label}^{new}$.
+
+Finally, we plot the inferred labels against the reference label in figure 11,12 and 13.
+
+
+\includegraphics[width=170mm]{figure_11.png}
+\bigskip
+
+\centerline{Fig.11 1-1 plot of label $Teff$}
+\bigskip
+
+
+\includegraphics[width=170mm]{figure_12.png}
+\bigskip
+
+\centerline{Fig.12 1-1 plot of label $logg$}
+\bigskip
+
+
+
+\includegraphics[width=170mm]{figure_13.png}
+\bigskip
+
+\centerline{Fig.13 1-1 plot of label $Fe/H$}
+\bigskip
+
+From these plots, we can conclude that the chi-squared of the inferred labels is smaller if we use the new model.
+
+The training time of the new six-label mode is about 7 times longer. But infer labels from the spectrum by using the new model is very quick, which means it's possible for us to apply this model for all stars in the APOGEE DR10.
+
 
   
   
