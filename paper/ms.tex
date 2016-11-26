@@ -258,8 +258,15 @@ Where $v_{deviation}$ is the deviation of the APOGEE data and $v_{pixel}$ =  414
 Before we obtain a, b and c for each visit, we need to continuum-normalize the spectrum of each visit. The spectrum for each visit we use are in apstar files, which are already resampled to the sample wavelength scale with 8575 pixels. The method we use is the same as the one in Ness et al 2015. First, cut all 8575 pixels into three chunks: [[371,3192], [3697,5997], [6461,8255]]. Then, do pseudo-normalization in these three regions and obtain the pseudo-normalized flux and inverse variance. Third, put a mask on the spectrum. Finally, fit the continuum spectrum in the continuous regions by using a 3-order sinusoid function and obtain the continuum-normalized spectrum.
 
 
-To check whether it works, we can infer labels by using these normalized visit. If the inferred labels from each visit are similar, the normalization works. 
-The details are in experiment 5.
+To check whether it works, we can infer labels by using these normalized visit. If the inferred labels from each visit are similar, the normalization works. The deviations for each star are defined as the inferred labels for every visit minus the ones from the combined spectrum and we define them as $\triangle Teff$, $\triangle$ logg and $\triangle$ Fe/H. 
+
+\begin{equation}
+\triangle Teff = Teff_{inf}^{vs} - Teff_{inf}^{cb}
+\end{equation}
+
+$Teff_{inf}^{vs}$ and $Teff_{inf}^{cb}$ are the inferred labels for each visit and the combined spectrum.
+
+If most of the deviations are small, the normalized spectrum for each visit doesn't lose shape, which means our normalization method works. The details are in experiment 5.
 
 
 
@@ -466,31 +473,47 @@ Here we choose the four stars with biggest a-c and obtain the radial velocity co
 \includegraphics[width=170mm]{figure_11.png}
 \bigskip
 
-\centerline{Fig.11 Comparison of the calibrated spectrum and the data spectrum}
+\centerline{Fig.11 Comparison of the calibrated spectrum and the data spectrum for the four stars with biggest a-c}
+
+\centerline{ The black line is the data spectrum. The green line is the inferred spectrum and the red line is the calibrated data spectrum}
 \bigskip
 
-After that, we want to calibrate the spectrum for each visit. Choose the first star in figure 11 and normalize all visits for it. Then, plot them in figure 12. To check whether our normalization works, infer labels for each visit and compare them. If our normalization works, the inferred labels of each visit should be similar to each other.
+We do the same thing four the four stars with biggest c-a.
+
 
 \includegraphics[width=170mm]{figure_12.png}
 \bigskip
 
-\centerline{Fig.12 Comparison of each visit for star XXR}
+\centerline{Fig.12 Comparison of the calibrated spectrum and the data spectrum for the four stars with biggest c-a.}
+
+\centerline{ The black line is the data spectrum. The green line is the inferred spectrum and the red line is the calibrated data spectrum}
 \bigskip
 
 
-We also plot the histogram which shows the deviations of the inferred labels for each visits from the ones for combined spectrum. The deviations for each star are defined as the inferred labels for every visit minus the ones from the combined spectrum. The data we use is the 614 stars in experiment 1 to 4. If most of the deviations are small, the normalized spectrum for each visit doesn't lose shape, which means our normalization method works.
+After that, we want to calibrate the spectrum for each visit. To begin with, we need to check whether our normalization works. The method is to infer labels for each visit and compare them. If our normalization works, the inferred labels from each visit for the same star should be similar to each other. We plot the histogram which shows the deviations of the inferred labels of each visits from the ones of combined spectrum for the same star. The deviations for each star are defined as the inferred labels for every visit minus the ones from the combined spectrum and we define them as $\triangle Teff$, $\triangle$ logg and $\triangle$ Fe/H. The data we use is the 614 stars in experiment 1 to 4. If most of the deviations are small, the normalized spectrum for each visit doesn't lose shape, which means our normalization method works.
 
 \includegraphics[width=170mm]{figure_13.png}
 \bigskip
 
-\centerline{Fig.13 Histogram for the deviations of the inferred labels}
+\centerline{Fig.13 Histogram for Delta Teff}
 \bigskip
 
 
+\includegraphics[width=170mm]{figure_14.png}
+\bigskip
 
-plot the correct radial velocity spetrum by using sinc interpolation
-plot the inferred labels plot the normalized spectrum for each apvisit and compare
-plot histogram of the deviation for inf labels for each visits.
+\centerline{Fig.14 Histogram for Delta logg}
+
+
+\bigskip
+
+\includegraphics[width=170mm]{figure_15.png}
+\bigskip
+
+\centerline{Fig.15 Histogram for Delta Fe/H}
+\bigskip
+
+We can see that most of the deviations are close to 0, which means our normalization for each visit doesn't make the spectrum distort.
 
 
 
@@ -519,60 +542,6 @@ plot histogram of the deviation for inf labels for each visits.
 \bigskip
 
 
-
-Comparison of the spectrum if we set the parameters shown in old figure 8. In old figure 8, the red line and the green line are on the top of each other
- \bigskip
-
-
-\includegraphics[width=170mm]{d_figure_2.png}
-\bigskip
-
-\centerline{Diagnostic Fig.2 Comparison of the spectrum if we set the parameters shown in old figure 8}
-\bigskip
-
- 
- 
- Comparison of the spectrum if we set the parameters shown in old figure 9. In old figure 9, the difference between red line and the green line is too big if we consider their parameters.
- \bigskip
-
-
-\includegraphics[width=170mm]{d_figure_3.png}
-\bigskip
-
-\centerline{Diagnostic Fig.3 Comparison of the spectrum if we set the parameters shown in old figure 9}
-\bigskip
-
-
- 
- 
- If we want a plot like old figure 9, we can manually set a=0.5, b=1 and c= -0.5. Here a+b+c is not equal to 1 and this is the cause of the offset.
- \bigskip
-
-
-\includegraphics[width=170mm]{d_figure_4.png}
-\bigskip
-
-\centerline{Diagnostic Fig.4 Comparison of the spectrum if we want a big difference between the red line and the green line}
-\bigskip
-
-
- 
- 
-In diagnostic plot 5, I use four fake stars. The data spectra of these four stars are generated by moving their inferred spectra one pixel left. If my new code is right, a, b and c will be [1,0,0]. In diagnostic figure 5, a=1, b=0 and c=0.
-\bigskip
-
-
-\includegraphics[width=170mm]{d_figure_5.png}
-\bigskip
-
-\centerline{Diagnostic Fig.5 Comparison of the spectrum for the four fake stars}
-\bigskip
-
-
-
-
-
- 
 
 
 
