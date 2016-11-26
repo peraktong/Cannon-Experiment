@@ -262,6 +262,11 @@ v_{deviation} = (c-a)*v_{pixel}
 \end{equation}
 Where $v_{deviation}$ is the deviation of the APOGEE data and $v_{pixel}$ =  4144.68 m/s.
 
+
+
+
+\subsection{\label{sec:level2} Obtain information from the individual exposures}
+
 %How do you continuum-normalize the individual exposures, and can you demonstrate to me that your proposal of how to do that is working well?
 
 Before deriving a, b and c for each visit, we need to continuum-normalize the spectrum of each visit. This is because the absolute value of each visit is different. Therefore, each visit spectrum needs to be roughly continuum normalized before they are combined. The APOGEE team uses a median filter to continuum-normalize the spectrum of each visit. 
@@ -296,11 +301,6 @@ If most of the deviations are small, the normalized spectrum for each visit does
 
 The details are in experiment 5.
 
-
-
-\subsection{\label{sec:level2} Obtain new information from the individual exposures}
-
-After calibrate the radial velocity, we can re-generate fluxes in Apstar files by using Apvisit files. The interpolation method we use is Sinc interpolation.
 
 
 
