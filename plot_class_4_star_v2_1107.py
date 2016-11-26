@@ -12,7 +12,45 @@ import os
 from astropy.io import fits
 import pickle
 import AnniesLasso_2 as tc
+import math
 
+
+
+def log10(x):
+    return math.log10(x)
+
+# sinc interpolation
+
+# Distance between s is equal and they are your raw data
+# u is what you want. Then length of u is not equal to s.
+
+def sinc_interp(x, s, u):
+    """
+    Interpolates x, sampled at "s" instants
+    Output y is sampled at "u" instants ("u" for "upsampled")
+    """
+
+    # Your x is the raw flux
+    # Your s is the wave length of the raw flux. s should have equal distance
+
+    # Your u is the log wl, which has equal distance between the neighborhoods.
+    # The length of u is 8575 and you can use log wl
+
+    if len(x) != len(s):
+        print("len(x) should be equal to len(s")
+
+    # Find the period
+    # T_r = s[1] - s[0]
+
+    # I don't think these two methods have a big different.
+
+    # Can we use this?
+    N = len(s)
+    T = (s[N-1]-s[0])/N
+
+    sincM = np.tile(u, (len(s), 1)) - np.tile(s[:, np.newaxis], (1, len(u)))
+    y = np.dot(x, np.sinc(sincM / T))
+    return y
 
 class plot_4:
     def __init__(self):
@@ -736,6 +774,8 @@ class plot_4:
         wl = pickle.load(pkl_file)
         pkl_file.close()
 
+
+
         all_set_flux = np.array(flux)
         all_set_ivar = np.array(ivar)
         all_set_error = np.array(error)
@@ -743,6 +783,7 @@ class plot_4:
 
         # plot
         nor = all_set_flux
+
         inf_old = inf_flux
 
         inf_opt, parameters_4 = self.model.fitting_spectrum_parameters_single(
@@ -751,6 +792,39 @@ class plot_4:
         error = all_set_error
 
         delta_chi = self.model.delta_chi_squared(all_set_flux, all_set_ivar, inf_flux)
+
+        ###########################
+        # Now calibrate the nor flux by using a b and c
+        wl_log = list(map(log10,wl))
+
+        wl_log = np.array(wl_log)
+
+        n_star = len(flux[:,0])
+
+        testing_flux_opt = []
+        testing_ivar_opt = []
+        velocity_correction = []
+
+        N = len(wl)
+        delta_wl = (wl_log[N - 1] - wl_log[0]) / N
+        one = np.ones(N)
+
+        for i in range(0, n_star):
+            wl_log_i = wl_log + (parameters_4[i, 0] - parameters_4[i, 2]) * delta_wl * one
+            velocity_correction.append((parameters_4[i, 2] - parameters_4[i, 0])*4144.68)
+            flux_i = sinc_interp(all_set_flux[i, :], wl_log_i, wl_log)
+            ivar_i = sinc_interp(all_set_ivar[i, :], wl_log_i, wl_log)
+
+            testing_flux_opt.append(flux_i)
+            testing_ivar_opt.append(ivar_i)
+            print("Doing star %d" % (i + 1))
+
+        testing_flux_opt = np.array(testing_flux_opt)
+        testing_ivar_opt = np.array(testing_ivar_opt)
+        velocity_correction = np.array(velocity_correction)
+
+        inf_opt = testing_flux_opt
+
 
         # plot-opt
         trans = 0.5
@@ -767,17 +841,17 @@ class plot_4:
         l4 = "Teff=%.3f Log g = %.3f" % (inf_label[3, 0], inf_label[3, 1])
 
         # delta-chi and parameters a, b and c.
-        delta_para_1 = "delta-chi-squared=%f a=%.3f b=%.3f c=%.3f" % (
-            delta_chi[0], parameters_4[0, 0], parameters_4[0, 1], parameters_4[0, 2])
+        delta_para_1 = "velocity correction=%f a=%.3f b=%.3f c=%.3f" % (
+            velocity_correction[0], parameters_4[0, 0], parameters_4[0, 1], parameters_4[0, 2])
 
-        delta_para_2 = "delta-chi-squared=%f a=%.3f b=%.3f c=%.3f" % (
-            delta_chi[1], parameters_4[1, 0], parameters_4[1, 1], parameters_4[1, 2])
+        delta_para_2 = "velocity correction=%f a=%.3f b=%.3f c=%.3f" % (
+            velocity_correction[1], parameters_4[1, 0], parameters_4[1, 1], parameters_4[1, 2])
 
-        delta_para_3 = "delta-chi-squared=%f a=%.3f b=%.3f c=%.3f" % (
-            delta_chi[2], parameters_4[2, 0], parameters_4[2, 1], parameters_4[2, 2])
+        delta_para_3 = "velocity correction=%f a=%.3f b=%.3f c=%.3f" % (
+           velocity_correction[2], parameters_4[2, 0], parameters_4[2, 1], parameters_4[2, 2])
 
-        delta_para_4 = "delta-chi-squared=%f a=%.3f b=%.3f c=%.3f" % (
-            delta_chi[3], parameters_4[3, 0], parameters_4[3, 1], parameters_4[3, 2])
+        delta_para_4 = "velocity correction=%f a=%.3f b=%.3f c=%.3f" % (
+            velocity_correction[3], parameters_4[3, 0], parameters_4[3, 1], parameters_4[3, 2])
 
         print(parameters_4)
 
@@ -822,10 +896,10 @@ class plot_4:
 
         # ax3
 
-        ax3.step(wl, nor[p1, :], "k", label=l2, alpha=1, linewidth=1.5)
-        ax3.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax3.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax3.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax3.step(wl, nor[p2, :], "k", label=l2, alpha=1, linewidth=1.5)
+        ax3.errorbar(wl, nor[p2, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax3.plot(wl, inf_opt[p2, :], "r", alpha=trans, linewidth=1.5)
+        ax3.plot(wl, inf_old[p2, :], "g", alpha=trans, linewidth=1.5)
 
         ax3.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -837,10 +911,10 @@ class plot_4:
 
         # ax4
 
-        ax4.step(wl, nor[p1, :], "k", label=delta_para_2, alpha=1, linewidth=1.5)
-        ax4.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax4.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax4.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax4.step(wl, nor[p2, :], "k", label=delta_para_2, alpha=1, linewidth=1.5)
+        ax4.errorbar(wl, nor[p2, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax4.plot(wl, inf_opt[p2, :], "r", alpha=trans, linewidth=1.5)
+        ax4.plot(wl, inf_old[p2, :], "g", alpha=trans, linewidth=1.5)
 
         ax4.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -852,10 +926,10 @@ class plot_4:
 
         # ax5
 
-        ax5.step(wl, nor[p1, :], "k", label=l3, alpha=1, linewidth=1.5)
-        ax5.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax5.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax5.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax5.step(wl, nor[p3, :], "k", label=l3, alpha=1, linewidth=1.5)
+        ax5.errorbar(wl, nor[p3, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax5.plot(wl, inf_opt[p3, :], "r", alpha=trans, linewidth=1.5)
+        ax5.plot(wl, inf_old[p3, :], "g", alpha=trans, linewidth=1.5)
 
         ax5.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -867,10 +941,10 @@ class plot_4:
 
         # ax6
 
-        ax6.step(wl, nor[p1, :], "k", label=delta_para_3, alpha=1, linewidth=1.5)
-        ax6.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax6.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax6.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax6.step(wl, nor[p3, :], "k", label=delta_para_3, alpha=1, linewidth=1.5)
+        ax6.errorbar(wl, nor[p3, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax6.plot(wl, inf_opt[p3, :], "r", alpha=trans, linewidth=1.5)
+        ax6.plot(wl, inf_old[p3, :], "g", alpha=trans, linewidth=1.5)
 
         ax6.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -882,10 +956,10 @@ class plot_4:
 
         # ax7
 
-        ax7.step(wl, nor[p1, :], "k", label=l4, alpha=1, linewidth=1.5)
-        ax7.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax7.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax7.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax7.step(wl, nor[p4, :], "k", label=l4, alpha=1, linewidth=1.5)
+        ax7.errorbar(wl, nor[p4, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax7.plot(wl, inf_opt[p4, :], "r", alpha=trans, linewidth=1.5)
+        ax7.plot(wl, inf_old[p4, :], "g", alpha=trans, linewidth=1.5)
 
         ax7.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -897,10 +971,10 @@ class plot_4:
 
         # ax8
 
-        ax8.step(wl, nor[p1, :], "k", label=delta_para_4, alpha=1, linewidth=1.5)
-        ax8.errorbar(wl, nor[p1, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
-        ax8.plot(wl, inf_opt[p1, :], "r", alpha=trans, linewidth=1.5)
-        ax8.plot(wl, inf_old[p1, :], "g", alpha=trans, linewidth=1.5)
+        ax8.step(wl, nor[p4, :], "k", label=delta_para_4, alpha=1, linewidth=1.5)
+        ax8.errorbar(wl, nor[p4, :], ecolor='k', alpha=trans / 10, capthick=0.2, yerr=error[p1, :])
+        ax8.plot(wl, inf_opt[p4, :], "r", alpha=trans, linewidth=1.5)
+        ax8.plot(wl, inf_old[p4, :], "g", alpha=trans, linewidth=1.5)
 
         ax8.legend(bbox_to_anchor=(0, 0.65), loc=3,
                    ncol=1)
@@ -923,8 +997,6 @@ class plot_4:
 
         plt.show()
         # f.savefig(delta_para_1+".png",dpi=400,papertype = "a4")
-
-
 
 
 
