@@ -242,7 +242,7 @@ Consider Relativistic Doppler effect. The redshift factor is defined as z. The r
 \begin{equation}
 z = {{\lambda_0 - \lambda_s} \over \lambda_s} = \sqrt{{1+\beta} \over {1-\beta}} -1 \approx \beta
 \end{equation}
-Where $\beta ={ v \over c} $. $v$ is the radial velocity. $\lambda_0$ and $\lambda_s$ are the wave lengths measured at the observer and the source.
+Where $\beta ={ v \over {v_{light}}} $. $v$ is the radial velocity. $\lambda_0$ and $\lambda_s$ are the wave lengths measured at the observer and the source.$v_{light}$ is the speed of light.
 
 The data spectrum we use in experiment 1 to 4 is the combined spectrum and we start to use spectrum of each visit in experiment 5.
 
@@ -254,13 +254,22 @@ To begin with, we set the radial velocity to be positive if the star is leaving 
 \log_{10}\lambda_0 - \log_{10}\lambda_s = \log_{10}(1+\beta)
 \end{equation}
 
-All spectrums in Apstar files are set to the same wavelength scale. The wavelength start at 15100.802 $\AA$ and the logarithmic wavelength grid spacing between two pixels is $6*10^{-6}$. By using (9), we find that one pixel is related to radial velocity 4144.68 m/s, which means if a=1 b= 0 and c=0, the radial velocity error in the APOGEE data is $-4144.68 m/s$
+All spectrums in Apstar files are set to the same wavelength scale. The wavelength start at 15100.802 $\AA$ and the logarithmic wavelength grid spacing between two pixels is $6*10^{-6}$. By using (9), we find that one pixel is related to radial velocity 4144.68 m/s, which means if the data spectrum moves one pixel left, the radial velocity shift in the APOGEE data is $-4144.68 m/s$. 
+\\ In the following formulas, $v_{shift}$ is the shift of the radial velocity in APOGEE data and $v_{pixel}$ =  4144.68 m/s, which is the radial velocity related to one pixel. $v_{light}$ is the speed of light.
 
-Thus we can use a, b and c to determine the radial velocity shift for the combined spectrum and each visit of the APOGEE data.
+We can use a, b and c to determine the radial velocity shift for the combined spectrum and each visit of the APOGEE data.
+If the parameters are a, b and c, $a\over{a+b+c}$ of the spectrum moves one pixel left, $c\over{a+b+c}$ of the spectrum moves one pixel right and $b\over{a+b+c}$ of the spectrum doesn't move. The spectrum moves one pixel left has $v_{shift} = -v_{pixel}$ and the one moves one pixel right has $v_{shift} = v_{pixel}$. ${a+c}\over2$ of the spectrum is broadening but it's included in the spectrum moves left and right. Thus the data spectrum moves ${c-a}\over{(a+b+c)}$ pixel right and we have
+
 \begin{equation}
-v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}
+\log_{10} (1+{v_{shift}}/v_{light}) = {{c-a}\over{(a+b+c)}}*\log_{10}(1+{v_{pixel}}/v_{light})
 \end{equation}
-Where $v_{shift}$ is the shift of the radial velocity in APOGEE data and $v_{pixel}$ =  4144.68 m/s.
+
+$v_{shift}/v_{light}$ and $v_{pixel}/v_{light}$ are small so we can use Taylor expansion. Then we have:
+
+\begin{equation}
+v_{shift} = {{(c-a)*v_{pixel}}\over{a+b+c}}
+\end{equation}
+
 \bigskip
 
 
@@ -359,7 +368,9 @@ Star D & -0.009  & 1.029 & -0.020 & 1.000 \\ [1ex]
 
 
  
+\begin{center}
 \includegraphics[width=170mm]{figure_1.png}
+\end{center}
  \centerline{Fig.1 The spectrum of Star A, B, C and D}
  
  \centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
@@ -379,8 +390,9 @@ In experiment 1, we use only four stars to obtain parameters a, b and c and the 
 
 We plot a, b, c against the mean fiber number, which is the average fiber number of the spectrum we optimize. In APOGEE DR 10, the fiber number is between 1 and 640. The parameters we use are from figure 3
 
+\begin{center}
 \includegraphics[width=170mm]{figure_2.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.2 a,b,c vs Mean Fiber Number}
 \bigskip
@@ -389,10 +401,10 @@ This figure gives us information about the relation between parameters a, b, c a
 \bigskip
 
 We also plot delta-chi-squared vs Mean Fiber number, where delta-chi-squared is the difference between the chi-squared of the spectrum before our optimization and after. It should be bigger than 0.
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{figure_3.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.3 Delta-chi-squared vs Mean Fiber Number}
 \bigskip
@@ -406,17 +418,17 @@ Now choose some examples from the 614 stars and make some plots.Sometimes the in
 
 First, plot the four stars with biggest delta-chi-squared and smallest delta-chi-squared:
 
+\begin{center}
 \includegraphics[width=170mm]{figure_4.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.4 Spectrum of the four stars with biggest delta-chi-squared. }
 
 \centerline{The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
-\bigskip
 
-
+\begin{center}
 \includegraphics[width=170mm]{figure_5.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.5 Spectrum of the four stars with smallest delta-chi-squared. }
 
@@ -427,10 +439,10 @@ From figure 6 and 7, we find that the four stars with smallest delta-chi-squared
 
 Also, we want to look into the spectral broadening.
 Plot four stars with b closest to 1:
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{figure_6.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.6 Spectrum of the four stars with b closest to 1. }
 
@@ -440,10 +452,10 @@ Plot four stars with b closest to 1:
 From the histogram of a, b and c, we also find that sometimes b becomes much smaller than a+c, which means the spectrum is broadening due to the measurement. The resolution of the spectrum becomes lower and this is what we want to calibrate.
 \bigskip
 Here is the plot of the four stars with biggest a+c-b:
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{figure_7.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.7 Spectrum of the four stars with biggest a+c-b. }
 
@@ -458,10 +470,10 @@ Also, the optimized spectrum broaden when a+c is much bigger than b, which means
 \bigskip
 
 To look deeper into the results, we also choose the four stars with biggest $a-c$ and biggest $c-a$. Then make another two plots:
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{figure_8.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.8 Spectrum of the four stars with biggest $a-c$.}
 
@@ -470,10 +482,11 @@ To look deeper into the results, we also choose the four stars with biggest $a-c
 
 
 
-\bigskip
 
+
+\begin{center}
 \includegraphics[width=170mm]{figure_9.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.9 Spectrum of the four stars with biggest $c-a$.}
 
@@ -488,8 +501,9 @@ For spectrum with $a>c$, the optimized spectrum moves left a little bit, which m
 \bigskip
 We also plot the inferred labels $Teff$ against log g. The color bar shows the mean inverse variance of these stars.
 
+\begin{center}
 \includegraphics[width=170mm]{figure_10.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.10 $Teff$ vs $log g$}
 \bigskip
@@ -498,8 +512,9 @@ We also plot the inferred labels $Teff$ against log g. The color bar shows the m
 
 Here we plot the histogram of the radial velocity shifts in figure 11 and the radial velocity shifts in figure 12. The data we use is the combined spectrums of the 614 stars in the former experiment.
 
+\begin{center}
 \includegraphics[width=170mm]{figure_11.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.11 Histogram of the radial velocity shifts in combined spectrums for the 614 stars. }
 \centerline{We exclude the outliers which have velocity shifts bigger than 2000 m/s}
@@ -509,8 +524,9 @@ Here we plot the histogram of the radial velocity shifts in figure 11 and the ra
 
 
 
+\begin{center}
 \includegraphics[width=170mm]{figure_12.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.12 Radial velocity shifts for combined spectrums of the 614 stars against mean fiber number}
 \centerline{We exclude the outliers which have velocity shifts bigger than 2000 m/s}
@@ -519,8 +535,9 @@ Here we plot the histogram of the radial velocity shifts in figure 11 and the ra
 
 We also plot the four stars with biggest radial velocity shifts, which are in figure 13.
 
+\begin{center}
 \includegraphics[width=170mm]{figure_13.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.13 Spectrum of the four stars with biggest radial velocity shifts.}
 
@@ -533,23 +550,25 @@ We also plot the four stars with biggest radial velocity shifts, which are in fi
 
 After that, we want to calibrate the radial velocity for each visit. To begin with, we need to check whether our normalization works in each visit. The method is to infer labels for each visit and compare them with the ones from the combined spectrum. If our normalization works, the inferred labels from each visit for the same star should be similar to the ones from the combined spectrum. We plot the histogram which shows the deviations of the inferred labels of each visit from the ones generated by the combined spectrum of the same star. The data we use is the 614 stars in experiment 1 to 4. If most of the deviations are small, the normalized spectrum for each visit doesn't lose shape, which means our normalization method works.
 
+\begin{center}
 \includegraphics[width=170mm]{figure_14.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.14 Histogram for Delta Teff}
 \bigskip
 
 
+\begin{center}
 \includegraphics[width=170mm]{figure_15.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.15 Histogram for Delta logg}
 
 
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{figure_16.png}
-\bigskip
+\end{center}
 
 \centerline{Fig.16 Histogram for Delta Fe/H}
 \bigskip
@@ -558,8 +577,10 @@ We can see that most of the deviations are close to 0, which means our normaliza
 
 In figure 16, we plot the continuum-normalized fluxes of all visits for the first star in figure 8. There are 9 individual visits. We can see that the absolute value of the flux for each visit is similar to each other, which means our normalization works.
 
+\begin{center}
 \includegraphics[width=170mm]{figure_17.png}
-\bigskip
+\end{center}
+
 
 \centerline{Fig.17 Comparison of each visit for the first star in figure 8.}
 \bigskip
@@ -589,27 +610,26 @@ In figure 16, we plot the continuum-normalized fluxes of all visits for the firs
  Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
  \bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{d_figure_1.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.1 Histogram of a b c for apstar data (What we use now)}
 \bigskip
 
 I plot the histogram of radial velocity shifts derived by using $v_{shift} = (c-a)*v_{pixel}$ in diagnostic figure 2 and velocity shifts against mean fiber number in diagnostic figure 3.
 
-\bigskip
-
+\begin{center}
 \includegraphics[width=170mm]{d_figure_2.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.2 Histogram of radial velocity shifts}
 \centerline{The formula to derive velocity shifts is $v_{shift} = (c-a)*v_{pixel}$}
 \bigskip
 
-\bigskip
-
+\begin{center}
 \includegraphics[width=170mm]{d_figure_3.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.3 Radial velocity shifts against mean fiber number}
 \centerline{The formula to derive velocity shifts is $v_{shift} = (c-a)*v_{pixel}$}
@@ -618,8 +638,9 @@ I plot the histogram of radial velocity shifts derived by using $v_{shift} = (c-
 
 We also plot the four stars with biggest radial velocity shifts, which are in figure 13. The formula I use is $v_{shift} = (c-a)*v_{pixel}$.
 
+\begin{center}
 \includegraphics[width=170mm]{d_figure_4.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.4 Spectrum of the four stars with biggest radial velocity shifts.}
 
@@ -628,22 +649,54 @@ We also plot the four stars with biggest radial velocity shifts, which are in fi
 \bigskip
 
 The original histogram of radial velocity shifts for figure 11.
-\bigskip
 
+\begin{center}
 \includegraphics[width=170mm]{d_figure_5.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.5 Histogram of radial velocity shifts}
 \centerline{The formula to derive velocity shifts is $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$}
 \bigskip
 
-\bigskip
-
+\begin{center}
 \includegraphics[width=170mm]{d_figure_6.png}
-\bigskip
+\end{center}
 
 \centerline{Diagnostic Fig.6 Radial velocity shifts against mean fiber number}
 \centerline{The formula to derive velocity shifts is $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$}
+\bigskip
+
+
+To check which method is better, we choose the four stars with smallest abs(a-c). These four stars have abs(a-c) smaller than 0.001 and we think their radial velocity shifts are 0. We call $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$ method A and $v_{shift} = (c-a)*v_{pixel}$ method B.
+
+First, move the data spectrum of the four stars one pixel left and the radial velocity shift should be $-v_{pixel}$= -4144.68$m/s$
+
+
+
+\begin{center}
+\includegraphics[width=170mm]{d_figure_7.png}
+\end{center}
+
+\centerline{Diagnostic Fig.7 Move the data spectrum one pixel left.}
+\centerline{the radial velocity shift should be $-v_{pixel}$= -4144.68$m/s$}
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
+\bigskip
+
+
+\bigskip
+
+
+Then, move the data spectrum of the four stars one pixel right and the radial velocity shift should be $v_{pixel}$= 4144.68$m/s$
+
+
+\begin{center}
+\includegraphics[width=170mm]{d_figure_8.png}
+\end{center}
+
+\centerline{Diagnostic Fig.8 Move the data spectrum one pixel right.}
+\centerline{the radial velocity shift should be $v_{pixel}$= 4144.68$m/s$}
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
+
 \bigskip
 
 
