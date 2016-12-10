@@ -138,9 +138,20 @@ def cross_correlation_velocity_v2(a,b,c):
     # remake-abc
 
     df = a * x + b * y + c * z
+
+    """
     print(a, b, c)
     print(4.144 * (c - a) / ((a ** 2 + b ** 2 + c ** 2) ** 0.5))
-    print(4.144 * (c - a) / ((a + c - 2 * b) * 4))
+    print(4.144 * (a-c) / ((a + c - 2 * b) * 2))
+
+    """
+
+    # use simple
+    simple = 4.144 * (c - a) / (a + b + c)
+    jason = 4.144 * (c - a) / ((a ** 2 + b ** 2 + c ** 2) ** 0.5)
+    david = 4.144 * (a - c) / ((a + c - 2 * b) * 2)
+    print(a,b,c)
+    print(simple,david)
 
     """
     # Plot template and data
@@ -168,5 +179,4 @@ def cross_correlation_velocity_v2(a,b,c):
         print("  A blue-shift with respect to the template")
 
     # CCF, David, Me
-    return 1000*rv[maxind],4140 * (c - a) / ((a + c - 2 * b) * 4),4.140 * (c - a) / ((a ** 2 + b ** 2 + c ** 2) ** 0.5)
-
+    return 1000*rv[maxind],1000*david,1000*simple

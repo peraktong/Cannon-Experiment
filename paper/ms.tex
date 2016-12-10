@@ -617,85 +617,96 @@ In figure 16, we plot the continuum-normalized fluxes of all visits for the firs
 \centerline{Diagnostic Fig.1 Histogram of a b c for apstar data (What we use now)}
 \bigskip
 
-I plot the histogram of radial velocity shifts derived by using $v_{shift} = (c-a)*v_{pixel}$ in diagnostic figure 2 and velocity shifts against mean fiber number in diagnostic figure 3.
+
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_2.png}
 \end{center}
 
-\centerline{Diagnostic Fig.2 Histogram of radial velocity shifts}
-\centerline{The formula to derive velocity shifts is $v_{shift} = (c-a)*v_{pixel}$}
+\centerline{Diagnostic Fig.2 Four fake stars with Gaussian wave pack spectrums}
+\centerline{The green line is the template and the black line is the observation}
 \bigskip
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_3.png}
 \end{center}
 
-\centerline{Diagnostic Fig.3 Radial velocity shifts against mean fiber number}
-\centerline{The formula to derive velocity shifts is $v_{shift} = (c-a)*v_{pixel}$}
+\centerline{Diagnostic Fig.3 Spectrum of the four stars with biggest c-a}
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum}
 \bigskip
 
-
-We also plot the four stars with biggest radial velocity shifts, which are in figure 13. The formula I use is $v_{shift} = (c-a)*v_{pixel}$.
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_4.png}
 \end{center}
 
-\centerline{Diagnostic Fig.4 Spectrum of the four stars with biggest radial velocity shifts.}
-
+\centerline{Diagnostic Fig.4 Spectrum of the four stars with biggest a-c}
 \centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
 
 \bigskip
 
-The original histogram of radial velocity shifts for figure 11.
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_5.png}
 \end{center}
 
-\centerline{Diagnostic Fig.5 Histogram of radial velocity shifts}
-\centerline{The formula to derive velocity shifts is $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$}
+\centerline{Diagnostic Fig.5 Spectrum of the four stars with biggest a+c-2b}
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum}
 \bigskip
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_6.png}
 \end{center}
 
-\centerline{Diagnostic Fig.6 Radial velocity shifts against mean fiber number}
-\centerline{The formula to derive velocity shifts is $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$}
+\centerline{Diagnostic Fig.6 Spectrum of the four stars with b closest to 1}
+\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum}
 \bigskip
-
-
-To check which method is better, we choose the four stars with smallest abs(a-c). These four stars have abs(a-c) smaller than 0.001 and we think their radial velocity shifts are 0. We call $v_{shift} = {{(c-a)*v_{pixel}}\over{4\cdot(a+c-2b)}}$ method A and $v_{shift} = (c-a)*v_{pixel}$ method B.
-
-First, move the data spectrum of the four stars one pixel left and the radial velocity shift should be $-v_{pixel}$= -4144.68$m/s$
-
 
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_7.png}
 \end{center}
 
-\centerline{Diagnostic Fig.7 Move the data spectrum one pixel left.}
-\centerline{the radial velocity shift should be $-v_{pixel}$= -4144.68$m/s$}
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
-\bigskip
+$v_cc$ is the velocity shift from the cross-correlation. $v_David$ is the velocity shift from David's formula. $v_Jason$ is the velocity shift from Jason's formula.
 
+\centerline{Diagnostic Fig.7 $v_cc$ vs$v_David$}
 
 \bigskip
 
 
-Then, move the data spectrum of the four stars one pixel right and the radial velocity shift should be $v_{pixel}$= 4144.68$m/s$
+\bigskip
+
 
 
 \begin{center}
 \includegraphics[width=170mm]{d_figure_8.png}
 \end{center}
 
-\centerline{Diagnostic Fig.8 Move the data spectrum one pixel right.}
-\centerline{the radial velocity shift should be $v_{pixel}$= 4144.68$m/s$}
-\centerline{ The black line is the observed spectrum. The green line is the inferred spectrum and the red line is the optimized spectrum.}
+\centerline{Diagnostic Fig.8 $v_cc$ vs$v_Jason$}
+
+\bigskip
+
+\bigskip
+
+
+
+\begin{center}
+\includegraphics[width=170mm]{d_figure_9.png}
+\end{center}
+
+\centerline{Diagnostic Fig.9 $v_cc$ vs$v_David$}
+
+\bigskip
+
+\bigskip
+
+
+
+\begin{center}
+\includegraphics[width=170mm]{d_figure_10.png}
+\end{center}
+
+\centerline{Diagnostic Fig.10 $v_cc$ vs$v_Jason$}
 
 \bigskip
 
