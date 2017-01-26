@@ -109,8 +109,8 @@ all_set = Table.read("/Users/caojunzhi/Desktop/NYU/Laboratory/task 2016.8.1-12.2
 # choose some of them
 choose = []
 a=0
-for i in range(0,3200):
-    a += np.random.randint(1,15)
+for i in range(0,4000):
+    a += np.random.randint(1,14)
     choose.append(a)
 
 choose = np.array(choose)
@@ -148,9 +148,12 @@ start_time = time.time()
 
 # save the path of the flux fits and the path of the opt parameters fits
 
-path_flux = []
-path_fits = []
+path_flux = np.array(["start"])
+path_fits = np.array(["start"])
 
+
+# mean ivar
+mi = []
 
 
 for i, row in enumerate(all_set):
@@ -158,6 +161,11 @@ for i, row in enumerate(all_set):
 
 
         image_path = "/Volumes/Data_2TB/Data/APOGEE_DR10_Apstar/apStar-s3-" + row["APOGEE_ID"] + ".fits"
+
+
+        RA = row["RA"]
+        DEC = row["DEC"]
+        SNR = row["SNR"]
 
         if not os.path.exists(image_path):
             print("{}/{} could not be found: {}".format(i + 1, N, image_path))
@@ -209,6 +217,12 @@ for i, row in enumerate(all_set):
             FiberID = m
 
             tr_ID = image_path
+            # data
+            MJD = dat[0]["MJD"]
+
+            # APOGEE velocity
+
+            VHELIO = dat[0]["VHELIO"]
 
             ## This is the real successful ones.
 
@@ -220,11 +234,11 @@ for i, row in enumerate(all_set):
             # by jason
 
             try:
-                star = len(flux[:, 0])
+                ni = len(flux[:, 0])
                 one = np.ones(len(flux[0, :]))
 
             except IndexError:
-                star = 1
+                ni = 1
                 one = np.ones(len(flux))
 
             else:
@@ -265,6 +279,11 @@ for i, row in enumerate(all_set):
                 opt_flux, parameters = model.fitting_spectrum_parameters_single \
                     (norm_tr_flux, norm_tr_ivar, inf_flux)
 
+                opt_flux_5 , parameters_5 = model.fitting_spectrum_parameters_single_5(norm_tr_flux, norm_tr_ivar, inf_flux)
+
+                parameters = np.c_[parameters,parameters_5]
+
+
                 delta_chi_squared = model.delta_chi_squared(norm_tr_flux,norm_tr_ivar,inf_flux)
 
                 chi_squared = model.chi_squared
@@ -272,26 +291,58 @@ for i, row in enumerate(all_set):
 
                 # by jason
 
-                norm_tr_flux = norm_tr_flux[1:star, :]
-                norm_tr_ivar = norm_tr_ivar[1:star, :]
-                inf_labels = inf_labels [1:star, :]
-                delta_chi_squared = delta_chi_squared[1:star]
-                chi_squared = chi_squared[1:star]
+                norm_tr_flux = norm_tr_flux[1:ni+1, :]
+                norm_tr_ivar = norm_tr_ivar[1:ni+1, :]
+                inf_labels = inf_labels [1:ni+1, :]
+                delta_chi_squared = delta_chi_squared[1:ni+1]
+                chi_squared = chi_squared[1:ni+1]
 
-                inf_flux = inf_flux[1:star, :]
-                opt_flux = opt_flux[1:star, :]
-                parameters = parameters[1:star, :]
+                inf_flux = inf_flux[1:ni+1, :]
+                opt_flux = opt_flux[1:ni+1, :]
+                parameters = parameters[1:ni+1, :]
+
+                # others
 
                 FiberID = np.array(FiberID)
                 labels = np.array(test_labels_all_i)
 
                 # calculate velocity
 
+
                 velocity_correction = []
                 n_star = len(parameters[:, 0])
 
+                #for i in range(0, n_star):
+                #    velocity_correction.append((parameters[i, 2] - parameters[i, 0]) * 4144.68)
+                #velocity_correction = np.array(velocity_correction)
                 for i in range(0, n_star):
-                    velocity_correction.append((parameters[i, 2] - parameters[i, 0]) * 4144.68)
+
+                    # jason
+                    v1 = 4144.68*(parameters[i,2]-parameters[i,0])/(parameters[i,0]+parameters[i,1]+parameters[i,2])
+                    # david
+                    v2 = 4144.68*(parameters[i,2]-parameters[i,0])/(-parameters[i,0]+2*parameters[i,1]-parameters[i,2])/2
+                    # Jason_5_point
+                    a = parameters[i,0]
+                    b = parameters[i,1]
+                    c = parameters[i,2]
+                    a1 = parameters[i,3]
+                    a2 = parameters[i, 4]
+                    a3 = parameters[i, 5]
+                    a4 = parameters[i, 6]
+                    a5 = parameters[i, 7]
+                    v3 = 4144.68*(2*a5+1*a4-1*a2-2*a1)/(a1+a2+a3+a4+a5)
+
+                    if 2*b<a+c:
+                        ve = v3
+                    else:
+                        ve = v1
+
+
+                    #velocity_i = np.array([v1, v2, v3])
+                    velocity_correction.append([v1,v3,ve])
+
+
+                    #velocity_correction.append((parameters[i, 2] - parameters[i, 0]) * 4144.68/(4*(parameters[i,0]+parameters[i,2]-2*parameters[i,1])))
                 velocity_correction = np.array(velocity_correction)
 
                 # check shape
@@ -363,35 +414,96 @@ for i, row in enumerate(all_set):
                     ## save the fits files and the path files.
 
                     success += 1
+                    mi.append(mean_ivar)
 
-                    path_fits_i = "/Users/caojunzhi/Desktop/Data/n_900/" + row["APOGEE_ID"] + ".fits"
+                    path_fits_i = "/Users/caojunzhi/Desktop/Data/n_600/" + row["APOGEE_ID"] + ".fits"
 
-                    path_fits.append(path_fits_i)
+                    path_fits = np.append(path_fits,path_fits_i)
 
-                    path_flux.append(image_path)
+                    path_flux = np.append(path_flux,image_path)
 
 
                     # save fits
 
-                    hdu = fits.PrimaryHDU(data=a1)
-                    hdu.header['COMMENT'] = "There are 11 columns of the table object: nor_flux" \
-                                    "nor_ivar, inf_flux, opt_flux, parameters, chi-squared, delta_chi_squared, fiber_id, labels, inf_labels" \
-                                    "velocity_shift"
+                    print("saving files"+path_fits_i)
 
-                    # add spurious header info
+                    prihdr = fits.Header()
+                    prihdr['COMMENT'] = "The first four HDU lists are nor_flux, nor_ivar, inf_flux and opt_flux" \
+                                    "Other information is in header"
 
-                    hdu.writeto(path_fits_i, clobber=True)
+                    prihdu = fits.PrimaryHDU(data=a1, header=prihdr)
+
+                    # add header info
+                    prihdu.header['SNR'] = SNR
+                    prihdu.header['RA'] = RA
+                    prihdu.header['DEC'] = DEC
+
+
+
+                    # Let's write some columns
+
+                    #MJD
+
+                    c1 = fits.Column(name='MJD', format='PJ()',
+                                 array=np.array([MJD],
+                                                dtype=np.object))
+
+                    #VHELIO
+                    c2 = fits.Column(name='VHELIO', format="PJ()", array=np.array([VHELIO], dtype=np.object))
+
+
+                    # a5-parameters
+
+                    c3 = fits.Column(name='parameters', format='PJ()',
+                                 array=np.array(parameters,
+                                                dtype=np.object))
+
+                    # a6-chi-squared
+
+                    c4 = fits.Column(name='chi_squared', format='PJ()',
+                                 array=np.array([chi_squared],
+                                                dtype=np.object))
+
+                    # a7-delta-chi_squared
+
+                    c5 = fits.Column(name='d_chi_squared', format='PJ()',
+                                 array=np.array([delta_chi_squared],
+                                                dtype=np.object))
+
+                    # a8-fiberID
+
+                    c6 = fits.Column(name='FiberID', format='PJ()',
+                                 array=np.array([FiberID],
+                                                dtype=np.object))
+
+                    # a9-labels
+
+                    c7 = fits.Column(name='labels', format='PJ()',
+                                 array=np.array([labels],
+                                                dtype=np.object))
+
+                    # a10 inf_labels
+
+                    c8 = fits.Column(name='inf_labels', format='PJ()',
+                                 array=np.array(inf_labels,
+                                                dtype=np.object))
+
+                    # a11 velocity_correction
+
+                    c9 = fits.Column(name='vc', format='PJ()',
+                                 array=np.array(velocity_correction,
+                                                dtype=np.object))
+
+                    tbhdu = fits.BinTableHDU.from_columns([c1, c2,c3,c4,c5,c6,c7,c8,c9])
+
+                    thdulist = fits.HDUList([prihdu, tbhdu])
+
+
+                    thdulist.writeto(path_fits_i, clobber=True)
 
                     ts.append(path_fits_i, a2)
                     ts.append(path_fits_i, a3)
                     ts.append(path_fits_i, a4)
-                    ts.append(path_fits_i, a5)
-                    ts.append(path_fits_i, a6)
-                    ts.append(path_fits_i, a7)
-                    ts.append(path_fits_i, a8)
-                    ts.append(path_fits_i, a9)
-                    ts.append(path_fits_i, a10)
-                    ts.append(path_fits_i, a11)
 
 
 
@@ -413,11 +525,15 @@ for i, row in enumerate(all_set):
 
 
 
-
+N = len(path_fits)
+path_fits = path_fits[1:N]
+path_flux = path_flux[1:N]
 
 path_fits = np.array(path_fits)
 
 path_flux = np.array(path_flux)
+
+mi = np.array(mi)
 
 
 print(success)
@@ -425,16 +541,20 @@ print(success)
 
 # save them
 
-output = open('n_900_path_fits.pkl', 'wb')
+output = open('n_600_path_fits.pkl', 'wb')
 pickle.dump(path_fits, output)
 output.close()
 
-output = open('n_900_path_flux.pkl', 'wb')
+output = open('n_600_path_flux.pkl', 'wb')
 pickle.dump(path_flux, output)
 output.close()
 
-output = open('n_900_choose.pkl', 'wb')
+output = open('n_600_choose.pkl', 'wb')
 pickle.dump(choose, output)
+output.close()
+
+output = open('n_600_mean_ivar.pkl', 'wb')
+pickle.dump(mi, output)
 output.close()
 
 
