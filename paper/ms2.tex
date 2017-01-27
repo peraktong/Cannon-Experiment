@@ -53,7 +53,7 @@ Max-Planck-Institut Max-Planck-Institut fuer Astronomie 17, D-69117 Heidelberg, 
 \section{\label{sec:level1}Abstract}
 
 
-The Cannon is a powerful tool which can predict the stellar labels from fluxes, which is a data-driven machine learning model. Also, it can infer fluxes from the stellar labels. Here we use the Cannon as a tool to calibrate the radial velocities(RV) in APOGEE DR 10 by fitting the inferred fluxes with the data fluxes. Then we compare our RV shift result with the APOGEE team and conclude our method is better. The most important thing of this work is that we can calibrate the velocity by using a new method-use data-driven model to calibrate physical parameters without using physical model. This is quicker than better than traditional methods.
+The Cannon, which is a data-driven machine learning model \cite{ness2015cannon}, is a powerful tool that can predict stellar labels from spectra. Also, it can infer fluxes from the stellar labels. Here we use the Cannon as a tool to calibrate radial velocities(RV) in APOGEE DR10 by fitting the inferred fluxes with the data fluxes. Then we compare our RV shift results with the ones from APOGEE team and conclude our method is better. The most important thing about this work is that we can calibrate the velocity by using a new data-driven model to calibrate physical parameters without using any physical model. This is quicker than better than traditional methods.
  
  %% second paragraph
  
@@ -62,18 +62,29 @@ The Cannon is a powerful tool which can predict the stellar labels from fluxes, 
  \section{\label{sec:level1}Assumption and method}
  
  \subsection{\label{sec:level2}Continuum normalization}
-Since the Cannon need the spectrums to be normalized. The first thing we should do is to continuum normalize the combined spectrums and individual visits. The data we use is the Apstar files in APOGEE DR10, which include two combined spectrums and several individual visits and they are set to the same wavelength scale after removing the radial velocities derived by APOGEE team. There are 8575 pixels and the wave length is equally logarithmically-spaced. The wavelength starts at 1.514 $\mu m$ and ends at 1.696 $\mu m$.
+Since the Cannon needs the spectrums to be normalized. The first thing we should do is to continuum-normalize the combined spectrums and individual visits. The data we use is in Apstar files from APOGEE DR10, which include two combined spectrums and several individual visits for one star. They are set to the same rest wavelength scale after removing the radial velocities derived by APOGEE team. There are 8575 pixels and the wavelength is equally logarithmically-spaced. The wavelength starts at 1.514 $\mu m$ and ends at 1.696 $\mu m$.
 \bigskip
 
-Our method is the same as the one in Ness et al 2015. The spectrum for each visit is in Apstar files, which are already resampled onto the sample wavelength scale with 8575 pixels. First, cut all 8575 pixels into three chunks: [[371,3192], [3697,5997], [6461,8255]] to avoid gaps in the spectrum. Then, do pseudo-normalization in these three regions and obtain the pseudo-normalized flux and inverse variance. Third, put a mask on the spectrum. Finally, fit the continuum spectrum in the continuous regions by using a 3-order sinusoid function and obtain the continuum-normalized spectrum. Our method is different from the one used by the APOGEE team and we will demonstrate it works.
-\bigskip
+Our method is the same as the one in Ness et al 2015 \cite{ness2015cannon}. The spectrums are in Apstar files, which are already resampled onto the sample wavelength scale with 8575 pixels. There are four steps for the normalization:
 
-To check whether our normalization methods works, we will:
 
 \begin{description}
-  \item[1] Plot the continuum pixels for combined spectrum and individual visits, then check whether they are roughly cover the spectrum evenly.
-  \item[2] Plot individual visits and compare them with the combined spectrum, they should have similar shape.
-  \item[3] Infer stellar labels from the individual visits by using the Cannon and the inferred labels should be similar from the ones from the combined spectrum for the very same star.
+ \item[1] Cut all 8575 pixels into three chunks: [[371,3192], [3697,5997], [6461,8255]] to avoid gaps in the spectrum.
+ \item[2] Do pseudo-normalization in these three regions and obtain the pseudo-normalized flux and inverse variance.
+ \item[3] Put a mask on the spectrum.
+ \item[4] Fit the continuum spectrum in the continuous regions by using a 3-order sinusoid function and obtain the continuum-normalized spectrum.
+\end{description}
+
+
+This normalization method is different from the one used by the APOGEE team and we will prove it works.
+\bigskip
+
+To check whether our normalization method works, we will:
+
+\begin{description}
+  \item[1] Plot continuum pixels for combined spectrums and individual visits, then check whether they roughly cover the spectrum evenly.
+  \item[2] Plot individual visits and compare them with the combined spectrum, they should have similar shapes.
+  \item[3] Infer stellar labels from individual visits by using the Cannon and these inferred labels should be similar to the ones from the combined spectrum of the very same star.
 \end{description}
 
 For point 3
@@ -99,21 +110,18 @@ If most of the deviations are small, the normalized spectrum for each visit does
 \subsection{\label{sec:level2}Calibrate the spectrums}
 
 %{\AA}
-In this part we will introduce the Cannon 2, and then use a linear method to optimize the inferred spectrum. Finally calibrate both the combined spectrum and individual visits.
-\bigskip
-
-In a word, the method we use to calibrate the radial velocities of the combined spectra and individual visits is:
+In this part we will introduce the Cannon 2 \cite{casey2016cannon}, and then use a linear method to optimize the inferred spectrum. Finally calibrate both the combined spectrum and individual visits. In a word, the method we use to calibrate the radial velocities of the combined spectra and individual visits is:
 
 
 \begin{description}
- \item[1] Infer labels from the fluxes of the combined spectra and individual visits. 
+ \item[1] Infer labels from combined spectra and individual visits. 
  \item[2] Input these labels into the Cannon and generate inferred fluxes for the combined spectra and individual visits. Use these inferred fluxes as templates to calibrate radial velocities.
  \item[3] Generate optimized fluxes and obtain parameters a, b and c. These parameters show the radial velocity shifts between the data fluxes and the inferred fluxes.
- \item[4] By assuming these inferred fluxes are at rest, derive the radial velocity shifts of these combined spectra and individual visits.
+ \item[4] By assuming these inferred fluxes are at rest, derive the radial velocity shifts of these combined spectra and individual visits. Finally, obtain the radial velocities of individual visits.
 \end{description}
 
 
-The very first thing we use is the Cannon 2. Suppose we have a trained Cannon model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. Every pixel is related to a specific wave length. It belongs to APOGEE data release 10 and has a good quality. These stellar are the very same objects as used by the APOGEE survey for the calibration of DR10. Each of them has at least nine stellar labels. But in the training step, we only use three of them $T_{eff}$, $log$ g  and $\left[Fe/H\right]$. They span the range of $3500K <T_{eff}< 5300K$, $0 <log$ $g< 5$ and $-2.5 <\left[Fe/H\right]< 0.45$. In the training step, we only use the first combined spectrum for these 548 stars to train the model.
+The very first thing we shall use is the Cannon 2. Suppose we have a trained Cannon model. The training set contains 548 stellar and each stellar spectrum has 8575 pixels. Every pixel is related to a specific wavelength. It belongs to APOGEE data release 10 and has a good quality. These stellar are the very same objects as used by the APOGEE survey for the calibration of DR10. Each of them has at least nine stellar labels. But in the training step, we only use three of them $T_{eff}$, $log$ g  and $\left[Fe/H\right]$. They span the range of $3500K <T_{eff}< 5300K$, $0 <log$ $g< 5$ and $-2.5 <\left[Fe/H\right]< 0.45$. In the training step, we only use the first combined spectrum for these 548 stars to train the model.
 The model we adopt
 
 \begin{equation}
@@ -135,22 +143,22 @@ $l_n$ and $l_n^{inf}$ are stellar labels and inferred stellar labels for star n.
 $y_{jn}^{inf}$ is the inferred spectrum for star n at wavelength pixel j.  
 
 
-If we have a trained Cannon 2 model, $\theta_{j}$ is available. The labels we use are Teff, Log g and Fe/H. We randomly choose about 1\% of the APOGEE DR10 and make a histogram plot. The mean inverse variance of the stars is bigger than 10000 but smaller than 40000. We also exclude stars with undetermined labels. (The label is set to -10000 if it's not determined.)The number of stars is 614. Apply the Cannon 2 on these stars and obtain the inferred labels and inferred fluxes for them. 
+If we have a trained Cannon 2 model, $\theta_{j}$ is available. The labels we use are Teff, Log g and Fe/H. Randomly choose about 1\% of the APOGEE DR10 and make a histogram plot. The mean inverse variance of the stars is bigger than 10000 but smaller than 40000. We also exclude stars with undetermined labels. (The label is set to -10000 if it's not determined.)The number of stars is 654. Apply the Cannon 2 on these stars and obtain inferred labels and inferred fluxes of them.
 
-From the normalized combined spectrum and fluxes of individual visits for the very same star, several sets of inferred labels $l_n^{inf}$ are obtained. Then put the inferred labels $l_n^{inf}$ back into formula (5), the inferred combined spectrum and inferred fluxes of individual visits for star n is available. The data spectrum we use are in Apstar files. There are two combined spectrum and several individual visits in the Apstar files. Put all of these spectrum into the trained Cannon 2 and obtain several sets of inferred labels for each star. After that, put the inferred labels back into the model and calculate the inferred combined spectrum(There should be two) and inferred fluxes of individual visits. 
+From the normalized combined spectrum and fluxes of individual visits of the very same star, several sets of inferred labels $l_n^{inf}$ are obtained. Then put the inferred labels $l_n^{inf}$ back into formula (5), the inferred combined spectrum and inferred fluxes of individual visits are available. The data spectrum we use are in Apstar files. There are two combined spectrums and several individual visits in the Apstar files. Put all these spectrums into the trained Cannon 2 and obtain several sets of inferred labels for each star. After that, put the inferred labels back into the model and calculate the inferred combined spectrum(There should be two) and inferred fluxes of individual visits. 
 \bigskip
 
 In the following step, we deal with the combined spectrum and individual visits with the same method. $y_{j,n}$ represents one spectrum of star n at pixel j. It can be either combined spectrum or individual visit.
 \bigskip
 
-The APOGEE team set the combined spectrum and fluxes of individual visits at rest by removing the radial velocities. However, since the derived radial velocities from the APOGEE team is not 100 \% correct, these fluxes are not at rest. There are radial velocity shifts between the radial velocities from the APOGEE team and the correct radial velocities. But we can assume the shifts of radial velocities are Gaussian distributed, so the inferred fluxes generated by the Cannon 2 are at rest. This means we can use inferred fluxes to calibrate the radial velocities derived by the APOGEE team. 
+The APOGEE team sets the combined spectrum and fluxes of individual visits at rest by removing the radial velocities. However, since the derived radial velocities from the APOGEE team are not 100 \% correct, these fluxes are not at rest. There are radial velocity shifts between the radial velocities from the APOGEE team and the correct radial velocities. But we can assume the shifts of radial velocities are Gaussian distributed, so the inferred fluxes generated by the Cannon 2 are at rest. This means we can use inferred fluxes as templates to calibrate radial velocities derived by the APOGEE team. \cite{holtzman2013calibrations}
 \bigskip
 
 \begin{equation}
 RV_{cor} = RV_{apo} + RV_{shift}
 \end{equation}
 
-Where $RV_{cor}$, $RV_{apo}$ and $RV_{shift}$ are the correct radial velocity, radial velocity from the APOGEE team and the radial velocity shift.
+Where $RV_{cor}$, $RV_{apo}$ and $RV_{shift}$ are the correct radial velocity, radial velocity from the APOGEE team and the radial velocity shift. In our experiment, we will derive the $RV_{shift}$.
 \bigskip
 
 
@@ -163,7 +171,7 @@ y_{j,n}^{opt}=a\cdot y_{j+1,n}^{inf}+b\cdot y_{j,n}^{inf}+c\cdot y_{j-1,n}^{inf}
 
 Where $y_{j,n}^{opt}$ is the optimized spectrum for star n at wavelength pixel j. We move the inferred spectrums one pixel left, 0 pixel and one pixel right to simulate the radial velocity shift of the data spectrum. 
 
-Then we fit the optimized spectrum to the data spectrum by using the least chi-squared method. After fitting the optimized spectrum to the data spectrum, we think the optimized spectrum has the very same radial velocity shift as the data spectrum. And we can derive the correct radial velocity of the spectrum by removing the radial velocity shift. So our objective function is the chi-squared between the optimized spectrum and the spectrum data. The objective function for star n is:
+Then we fit the optimized spectrum to the data spectrum by using the least chi-squared method. After that, we think the optimized spectrum has the very same radial velocity shift as the data spectrum. And we can derive the correct radial velocity of the spectrum by removing the radial velocity shift in formula 6. The objective function is the chi-squared between the optimized spectrum and the spectrum data. The objective function for one flux of star n is:
 \bigskip
 
 \begin{equation}
@@ -171,7 +179,7 @@ F^{obj}_n (a,b,c)= \sum_{j=1}^{j=J} {(y_{jn} - y_{jn}^{opt})^2 \over{\sigma_{jn}
 \end{equation}
 
 
-$\sigma_{jn}^2$ is the data uncertainty for star n at pixel j. The number of stellar and pixel each star are N and J. Here N and J are the number of the stellar and the number of pixel each star.  Write the objective function in the form of matrix can make it simpler. 
+$\sigma_{jn}^2$ is the data uncertainty for star n at pixel j. The number of stellar and pixel each star are N and J. Here N and J are the number of the stellar and the number of pixel each star.  Write the objective function in the form of matrix can make it simpler. \cite{hogg2010data}
 
 % insert matrix
 
@@ -252,7 +260,7 @@ J = {\partial F^{obj}_n\over \partial X_n } = 2\cdot [(Y_n-A_nX_n)^TC^{-1}]\cdot
 
 
 
-The dimension of the Jacobian Matrix is 1*3. To minimize the objective function, let the Jacobian Matrix be 0 and we have:
+The dimension of the Jacobian Matrix is (1,3). To minimize the objective function, let the Jacobian Matrix be 0 and we have:
 
 \begin{equation}
 X_n = [A_n^TC_n^{-1}A_n]^{-1} \cdot [A_n^TC_n^{-1}Y_n]
@@ -267,9 +275,7 @@ Calculate the optimized spectrum \( y_{j,n}^{opt}\) by using (4). The Experiment
 
 
 %Can you interpret a, b, c in terms of radial velocity? If so, how?
-After obtaining $a_n$, $b_n$ and $c_n$ for these stars, we can calibrate both the combined spectra and individual visits of these stars. These spectra are stored in Apstar files, which are regenerated onto a common, logarithmically-spaced wavelength scale after removing derived radial velocities of each visit. There are two combined spectrums for one star, which are obtained by different method. The radial velocities of the spectrums in Apstar files should be 0, but in fact they are not. This is because of the errors in the radial velocity measurement by the APOGEE team. 
-
-Consider Relativistic Doppler effect. The redshift factor is defined as z. The radial velocity is positive if the star is leaving us. 
+After obtaining $a_n$, $b_n$ and $c_n$ for these stars, we can calibrate both the combined spectra and individual visits of these stars. Consider Relativistic Doppler effect. The redshift factor is defined as z. The radial velocity is positive if the star is leaving us. 
 
 \begin{equation}
 z = {{\lambda_0 - \lambda_s} \over \lambda_s} = \sqrt{{1+\beta} \over {1-\beta}} -1 \approx \beta
@@ -280,7 +286,7 @@ Where $\beta ={ v \over {v_{light}}} $. $v$ is the radial velocity. $\lambda_0$ 
 The radial velocity is related to parameters a, b and c. First, we need to assume that the inferred spectrum generated by the Cannon is set at rest, which means the radial velocity of it is zero. Second, we think the radial velocity of the data spectrum is equal to the radial velocity of the optimized spectrum. This is because the optimized spectrum is obtained by fitting the inferred spectrum to the data spectrum. We set the radial velocity to be positive if the star is leaving us. 
 \bigskip
 
-The radial velocity is related to the pixels. We can obtain the velocity shift by calculating the centroid shift. The centroid in pixel can be expressed as:
+The radial velocity is related to pixels. We can obtain the velocity shift by calculating the centroid shift. The centroid in pixel can be expressed as:
 
 \begin{equation}
 pixel_c = {\sum_{j=1}^{j=J} {j*y_{jn}}\over\sum_{j=1}^{j=J} {y_{jn}}}
@@ -330,15 +336,15 @@ RV_{shift} = v_{pixel} \cdot {{c-a}\over{a+b+c}}\qquad2b>a+c
 RV_{shift} = v_{pixel} \cdot {{2a_5 +a_4 - a_2 - 2a_1}\over{a_1+a_2+a_3+a_4+a_5}}\qquad2b<a+c     
 \end{equation}
 
-We will plot the histogram for the five parameters in our experiment and demonstrate moving two pixels are good enough for these $2b<a+c$cases.
+We will plot the histogram for the five parameters in our experiment and demonstrate moving two pixels are good enough for these $2b<a+c$ cases.
 
 \subsection{\label{sec:level2}Why our method is better}
 % In EXP 3
 
-The APOGEE team derive the radial velocities of individual visits by two steps. First, derive the relative radial velocity between each visit and the combined spectrum iteratively. Second, absolute radial velocity determination of the combined spectrum against a grid of synthetic spectra spanning a large range of stellar parameters. All radial velocities in these two steps are determined by cross-correlating a spectrum against a template spectrum. This mean the result is very sensitive to the normalization method since the result of cross-correlation is influenced by normalization prominently. Also, the traditional synthesized spectrum in the second step is not very reliable, which means the absolute velocity is not very accurate. From these two points, there is still much to be improved in APOGEE team's RV results.
+The APOGEE team derive the radial velocities of individual visits by two steps. First, derive the relative radial velocity between each visit and the combined spectrum iteratively. Second, absolute radial velocity determination of the combined spectrum against a grid of synthetic spectra spanning a large range of stellar parameters. All radial velocities in these two steps are determined by cross-correlating a spectrum against a template spectrum. This means the result is very sensitive to the normalization method since the result of cross-correlation is influenced by normalization prominently. Also, the traditional synthesized spectrum in the second step is not very reliable, which means the absolute velocity is not very accurate. From these two points, there is still much to be improved in APOGEE team's RV results.
 \bigskip
 
-In experiment 3, firstly we will show the RVs for individual visits from the APOGEE team is not very reliable. Then, plot our results and compare it with the ones by the APOGEE team. Finally, conclude our method gives a better RV measurement for individual visits.
+In experiment 3, first, we will show the RVs for individual visits from the APOGEE team is not very reliable. Then, plot our results.  Finally, argue our method gives a better RV measurement for individual visits.
 
 
 
@@ -353,7 +359,7 @@ Working on it...
  \section{\label{sec:level1}Experiment}
  
  \subsection{\label{sec:level2}Experiment 1}
-To demonstrate the continuum normalization works well for the combined spectrums and individual visits, we plot the continuum pixels for stars with different SNR(signal to noise ratio), Teff and Logg. Here we randomly choose 5 stars with different SNR, Teff and logg and plot them in figure 1 to 5.
+To demonstrate the continuum normalization works well for combined spectrums and individual visits, we plot continuum pixels for stars with different SNR(signal to noise ratio), Teff and Logg. Here we randomly choose 5 stars with different SNR, Teff and logg and plot them in figure 1 to 5. If continuum pixels roughly cover the spectrums evenly, the normalization works well.
 
 
 % star A
@@ -422,9 +428,11 @@ To demonstrate the continuum normalization works well for the combined spectrums
 
 \end{center}
 
+These continuum pixels roughly cover the spectrums evenly, which means the normalization works well.
+
 \bigskip
 
-We can also demonstrate the continuum normalization works by infer stellar labels from individual visits and compare them with one from the combined spectrum. Here we use formula 1, 2 and 3 to obtain delta-stellar labels. If they are very small, the normalization works. They are plotted in figure 6, 7 and 8.
+We can also demonstrate the continuum normalization works by inferring stellar labels from individual visits and compare them with the ones from combined spectrums.  Here we use formula 1, 2 and 3 to obtain delta-stellar labels. If they are very small, the normalization works. They are plotted in figure 6, 7 and 8.
 
 
 
@@ -458,7 +466,7 @@ We can see that these delta-stellar labels of individual visits are close to 0, 
 
  \subsection{\label{sec:level2}Experiment 2}
  
- In experiment 2, we will focus on the parameters fitting for individual visits. First, we plot the histograms of parameters abc and RV shifts for individual visits.
+ In experiment 2, we will focus on the parameters fitting of individual visits. First, we plot the histograms of parameters abc and RV shifts of individual visits.
 \bigskip
 
 
@@ -478,7 +486,7 @@ We can see that these delta-stellar labels of individual visits are close to 0, 
 \bigskip
 
 
-Then, we try to find some relation between out results and FiberID, MJD(Modified Julia Date), RA and DEC. Figures 11, 12, 13, 14 and 15 shows the relation.
+Then, we try to find some relation between our results and FiberID, MJD(Modified Julia Date), RA and DEC. Figures 11, 12, 13, 14 and 15 shows the relation.
 
 
 \begin{center}
@@ -523,23 +531,12 @@ Then, we try to find some relation between out results and FiberID, MJD(Modified
 \centerline{Fig.15 RV shifts vs MJD, FiberID, RA and DEC for individual visitis}
 \bigskip
 
-We will show our results are better than APOGEE's in the nect experiment.
+We will show our results are better than APOGEE's in the next experiment.
 
 
 \subsection{\label{sec:level2}Experiment 3}
 
-Finally, we shows our RV shifts results are better than results from the APOGEE team. We demonstrate it by two steps:
-
-
-\begin{description}
-  \item[1] Use inferred fluxes as templates are reliable. These inferred fluxes are at rest.
-  \item[2] Our method for deriving the relative radial velocities between inferred fluxes and data spectra is good.
-
-\end{description}
-
-
-
-First, we show that use inferred fluxes as templates are reliable. Here we randomly choose 5 stars with different SNR, Teff, logg and Fe/H. Then plot the fluxes from the APOGEE team and the Cannon.
+Finally, we show our results are better than the results from the APOGEE team. We demonstrate it by randomly choosing 5 stars with different SNR, Teff, logg and Fe/H. Then plot the fluxes from the APOGEE team and the Cannon. We will show the inferred fluxes are at rest and our formula gives correct RV shifts.
 
 
 
@@ -617,12 +614,14 @@ First, we show that use inferred fluxes as templates are reliable. Here we rando
 
 \bigskip
 
-From these plots, we can see that the peak locations of fluxes from the APOGEE team shift, which should not happen because these fluxes are set at rest by the APOGEE team and there shouldn't be shifts between each fluxes. This means the radial velocities from the APOGEE team have some errors. When we look at the fluxes generated from the Cannon, the peaks from individual visits have the same positions. That's to say, we can use inferred fluxes from the Cannon as templates for calibration.
+From these plots, we can see that the peaks of fluxes from the APOGEE team have shifts from each other, which should not happen because these fluxes are set at rest by the APOGEE team and there shouldn't be shifts between them. This means radial velocities from the APOGEE team are not very accurate. When we look at the fluxes generated from the Cannon, the peaks from individual visits have the same positions. These spectrums are at rest. That's to say, we can use inferred fluxes from the Cannon as templates for calibration.
 \bigskip
 
-Then, we argue that our method for deriving the relative radial velocities between inferred fluxes and data spectra is good.
+Then, we argue that our method for deriving the relative radial velocities(RV shifts) between inferred fluxes and data spectra is good. The APOGEE team use Cross-correlation to derive RV shifts, which is very sensitive to the normalization method. Also, Cross-correlation means we need to interpolate the data, which may cause the broadening of the spectrum. Here most of the RV shifts are smaller than one pixel(Figure 10) and this means the cross-correlation may not be very reliable. 
 
+Our method is to move the inferred fluxes one pixel left and right. It uses two adjacent pixels and the pixel itself to calibrate each pixel. The prerequisite of this method is that the middle pixel accounts for a bigger proportion than the other two. This means considering three pixels is good enough. In figure 9, we can see that most b are close to 1 and most a, c are close to 0. This means our method works good for most of these cases. Even for the case that 2b<a+c, which means we need to consider at least 5 pixels. Our formula 20 gives a good expression. Since all the RV shifts in figure10 is smaller than 2 pixels, we don't need to consider 7 or more pixels. 
 
+In conclusion, the method we use to determine the RV shifts is good. It gives more accurate radial velocities than the APOGEE team.
 
   
  %% Fourth paragraph
@@ -639,7 +638,7 @@ Then, we argue that our method for deriving the relative radial velocities betwe
 Now we exclude stars with undetermined labels and re-plot the histogram of a, b and c.
  
 reference
-\bibliography{t_1,pubext} 
+\bibliography{citation,pubext} 
 
 
 
