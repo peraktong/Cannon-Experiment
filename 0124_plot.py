@@ -695,7 +695,7 @@ class plot():
         ax2.set_title('delta-chi-squared vs RA', fontsize=24,y=0.90)
 
         ax2.set_xlabel('RA', fontsize=30)
-        ax2.set_ylabel('delta-chi-squared', fontsize=30)
+        #ax2.set_ylabel('delta-chi-squared', fontsize=30)
 
         #ax2.set_position([0.5, 0.6, 0.4, 0.4])
 
@@ -727,7 +727,7 @@ class plot():
         ax4.set_title('delta-chi-squared vs FiberID', fontsize=24,y=0.90)
 
         ax4.set_xlabel('FIberID', fontsize=30)
-        ax4.set_ylabel('delta-chi-squared', fontsize=30)
+        #ax4.set_ylabel('delta-chi-squared', fontsize=30)
 
 
         #ax4.set_position([0.5,0, 0.4, 0.4])
@@ -1020,6 +1020,7 @@ model = plot()
 
 #model.c_subplot_4(c=parameters,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
+model.dchi_subplot_4(dchi=dchi,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
 """
 plt.plot(MJD,parameters,"ro")
@@ -1046,6 +1047,8 @@ plt.show()
 
 
 
+"""
+
 
 p = 628
 
@@ -1069,3 +1072,6 @@ model3 = plot_continuum_pixel()
 
 model3.plot_peak_single_star(flux = nor_i,inf_flux=inf_i)
 
+
+
+"""
