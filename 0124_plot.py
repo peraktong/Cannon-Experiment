@@ -865,10 +865,10 @@ class plot_continuum_pixel():
             # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
 
         axes = plt.gca()
-        # axes.set_xlim([15660, 15780])
+        axes.set_xlim([15660, 15780])
 
 
-        # axes.set_xlim([16160,16280])
+        axes.set_xlim([16160,16280])
         axes.set_ylim([0.5, 1 + 0.5 * N])
         # axes.set_yticks(np.arange(0.8,1.21,0.1))
 
@@ -878,6 +878,127 @@ class plot_continuum_pixel():
 
         plt.show()
 
+
+    def find_peak(self,flux):
+
+        # return the index of peak location
+
+        N = len(flux)
+
+        peak = []
+        for i in range(50,N-50):
+
+            m = flux[i]
+            l1 = flux[i-1]
+            l2 = flux[i-2]
+            l3 = flux[i-10]
+
+
+            r1 = flux[i+1]
+            r2 = flux[i + 2]
+            r3 = flux[i + 10]
+
+
+            if m<min(l1,l2,l3) and m<min(r1,r2,r3):
+                peak.append(i)
+            elif m>max(l1,l2,l3) and m>max(r1,r2,r3):
+                peak.append(i)
+
+        peak = np.array(peak)
+        return peak
+
+    def plot_peak_single_star(self,flux, inf_flux):
+
+
+
+        N = len(flux[:, 0])
+
+        name = ["combined spectrum", "combined spectrum"]
+        for j in range(0, N - 2):
+            name.append("individual visit")
+
+        plt.figure(1)
+
+        plt.subplot(2,1,1)
+
+
+        for i in range(N):
+            plt.plot(wl, flux[i] + 0.5 * i, label=name[i])
+
+
+            # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
+
+
+
+
+        ### Add vertical lines
+
+        peak_i = self.find_peak(flux[0,:])
+
+        n_p = len(peak_i)
+
+        for i in range(0,n_p):
+            index = peak_i[i]
+
+            plt.plot((wl[index],wl[index]), (0.5,1 + 0.5 * N), 'k-')
+
+        axes = plt.gca()
+        #axes.set_xlim([15660, 15780])
+
+        axes.set_xlim([15680, 15740])
+
+
+        # axes.set_xlim([16160,16280])
+        axes.set_ylim([0.5, 1 + 0.5 * N])
+        # axes.set_yticks(np.arange(0.8,1.21,0.1))
+
+        # plt.xlabel("Wave length $\AA$", fontsize=20)
+        plt.ylabel("Flux", fontsize=20)
+        plt.title("The fluxes of individual visits for one star from APOGGE team", fontsize=20)
+
+
+        # plot inf_flux:
+
+        plt.subplot(2, 1, 2)
+
+
+
+        for i in range(N):
+            plt.plot(wl, inf_flux[i] + 0.5 * i, label=name[i])
+
+
+            # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
+
+        # find peak:
+
+
+        ### Add vertical lines
+
+        peak_i = self.find_peak(inf_flux[0,:])
+
+        n_p = len(peak_i)
+
+        for i in range(0,n_p):
+            index = peak_i[i]
+            plt.plot((wl[index], wl[index]), (0.5, 1 + 0.5 * N), 'k-')
+
+
+
+
+        axes = plt.gca()
+        #axes.set_xlim([15660, 15780])
+        axes.set_xlim([15680, 15740])
+
+
+        # axes.set_xlim([16160,16280])
+        axes.set_ylim([0.5, 1 + 0.5 * N])
+        # axes.set_yticks(np.arange(0.8,1.21,0.1))
+
+        plt.xlabel("Wave length $\AA$", fontsize=20)
+        plt.ylabel("Flux", fontsize=20)
+        plt.title("The fluxes of individual visits from the Cannon", fontsize=20)
+
+        plt.show()
 
 model = plot()
 
@@ -916,22 +1037,25 @@ plt.show()
 # model.dchi_subplot_4(dchi=dchi,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
 
-model2 = plot_histogram()
+#model2 = plot_histogram()
 
 #model2.histogram_abc_visits(a,b,c)
 
 #model2.histogram_delta_chi_visits(dchi)
-model2.histogram_ve_visits(velocity)
+#model2.histogram_ve_visits(velocity)
 
 
-"""
 
-p =337
+
+p = 628
 
 star_choose = fits.open(path_fits[p])
 
 nor_i = star_choose[0].data
 ivar_i = star_choose[1].data
+inf_i = star_choose[2].data
+
+print(nor_i.shape,ivar_i.shape)
 
 label_i = star_choose[8].data
 SNR = star_choose[0].header["SNR"]
@@ -941,6 +1065,7 @@ print(SNR,label_i)
 
 model3 = plot_continuum_pixel()
 
-model3.plot_single_star(flux = nor_i,ivar = ivar_i)
+#model3.plot_single_star(flux = nor_i,ivar = ivar_i)
 
-"""
+model3.plot_peak_single_star(flux = nor_i,inf_flux=inf_i)
+
