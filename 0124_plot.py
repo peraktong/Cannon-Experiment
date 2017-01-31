@@ -148,10 +148,10 @@ class plot():
         ax1.scatter(MJD, velocity, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax1.set_title('RV shifts vs MJD', fontsize=24,y=0.90)
+        ax1.set_title('RV shifts vs MJD', fontsize=24,y=0.85)
 
-        ax1.set_xlabel('MJD', fontsize=30)
-        ax1.set_ylabel('RV shifts $m/s$', fontsize=30)
+        ax1.set_xlabel('MJD', fontsize=20)
+        ax1.set_ylabel('RV shifts $m/s$', fontsize=20)
 
 
         ax1.set_ylim([-6000,8000])
@@ -165,10 +165,10 @@ class plot():
         ax2.scatter(RA, velocity, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax2.set_title('RV shifts vs RA', fontsize=24,y=0.90)
+        ax2.set_title('RV shifts vs RA', fontsize=24,y=0.85)
 
-        ax2.set_xlabel('RA', fontsize=30)
-        ax2.set_ylabel('RV shifts $m/s$', fontsize=30)
+        ax2.set_xlabel('RA', fontsize=20)
+        ax2.set_ylabel('RV shifts $m/s$', fontsize=20)
 
         #ax2.set_position([0.5, 0.6, 0.4, 0.4])
 
@@ -182,10 +182,10 @@ class plot():
         ax3.scatter(DEC, velocity, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax3.set_title('RV shifts vs DEC', fontsize=24,y=0.90)
+        ax3.set_title('RV shifts vs DEC', fontsize=24,y=0.85)
 
-        ax3.set_xlabel('DEC', fontsize=30)
-        ax3.set_ylabel('RV shifts $m/s$', fontsize=30)
+        ax3.set_xlabel('DEC', fontsize=20)
+        ax3.set_ylabel('RV shifts $m/s$', fontsize=20)
 
         ax3.set_ylim([-6000, 8000])
         ax3.set_yticks(np.arange(-6000, 8001, 3500))
@@ -199,10 +199,10 @@ class plot():
         ax4.scatter(Fiber, velocity, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax4.set_title('RV shifts vs FiberID', fontsize=24,y=0.90)
+        ax4.set_title('RV shifts vs FiberID', fontsize=24,y=0.85)
 
-        ax4.set_xlabel('FIberID', fontsize=30)
-        ax4.set_ylabel('RV shifts $m/s$', fontsize=30)
+        ax4.set_xlabel('FIberID', fontsize=20)
+        ax4.set_ylabel('RV shifts $m/s$', fontsize=20)
 
         ax4.set_ylim([-6000, 8000])
         ax4.set_yticks(np.arange(-6000, 8001, 3500))
@@ -375,10 +375,12 @@ class plot():
         ax1.scatter(MJD, a, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax1.set_title('a vs MJD', fontsize=24,y=0.90)
+        ax1.set_title('a vs MJD', fontsize=24,y=0.85)
 
-        ax1.set_xlabel('MJD', fontsize=30)
-        ax1.set_ylabel('a', fontsize=30)
+        ax1.set_xlabel('MJD', fontsize=20)
+        ax1.set_ylabel('a', fontsize=20)
+        ax1.set_ylim([-2,3])
+        ax1.set_yticks(np.arange(-2,3.1,1))
 
 
 
@@ -390,10 +392,12 @@ class plot():
         ax2.scatter(RA, a, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax2.set_title('a vs RA', fontsize=24,y=0.90)
+        ax2.set_title('a vs RA', fontsize=24,y=0.85)
 
-        ax2.set_xlabel('RA', fontsize=30)
-        ax2.set_ylabel('a', fontsize=30)
+        ax2.set_xlabel('RA', fontsize=20)
+        ax2.set_ylabel('a', fontsize=20)
+        ax2.set_ylim([-2,3])
+        ax2.set_yticks(np.arange(-2,3.1,1))
 
         #ax2.set_position([0.5, 0.6, 0.4, 0.4])
 
@@ -406,10 +410,12 @@ class plot():
         ax3.scatter(DEC, a, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax3.set_title('a vs DEC', fontsize=24,y=0.90)
+        ax3.set_title('a vs DEC', fontsize=24,y=0.85)
 
-        ax3.set_xlabel('DEC', fontsize=30)
-        ax3.set_ylabel('a', fontsize=30)
+        ax3.set_xlabel('DEC', fontsize=20)
+        ax3.set_ylabel('a', fontsize=20)
+        ax3.set_ylim([-2,3])
+        ax3.set_yticks(np.arange(-2,3.1,1))
 
 
 
@@ -422,10 +428,12 @@ class plot():
         ax4.scatter(Fiber, a, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax4.set_title('a vs FiberID', fontsize=24,y=0.90)
+        ax4.set_title('a vs FiberID', fontsize=24,y=0.85)
 
-        ax4.set_xlabel('FIberID', fontsize=30)
-        ax4.set_ylabel('a', fontsize=30)
+        ax4.set_xlabel('FIberID', fontsize=20)
+        ax4.set_ylabel('a', fontsize=20)
+        ax4.set_ylim([-2,3])
+        ax4.set_yticks(np.arange(-2,3.1,1))
 
 
 
@@ -469,10 +477,10 @@ class plot():
         ax1.scatter(MJD, b, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax1.set_title('b vs MJD', fontsize=24,y=0.90)
+        ax1.set_title('b vs MJD', fontsize=24,y=0.85)
 
-        ax1.set_xlabel('MJD', fontsize=30)
-        ax1.set_ylabel('b', fontsize=30)
+        ax1.set_xlabel('MJD', fontsize=20)
+        ax1.set_ylabel('b', fontsize=20)
 
         ax1.set_ylim([-3,4])
         ax1.set_yticks(np.arange(-3,4.1,1))
@@ -488,10 +496,10 @@ class plot():
         ax2.scatter(RA, b, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax2.set_title('b vs RA', fontsize=24,y=0.90)
+        ax2.set_title('b vs RA', fontsize=24,y=0.85)
 
-        ax2.set_xlabel('RA', fontsize=30)
-        ax2.set_ylabel('b', fontsize=30)
+        ax2.set_xlabel('RA', fontsize=20)
+        ax2.set_ylabel('b', fontsize=20)
 
         ax2.set_ylim([-3,4])
         ax2.set_yticks(np.arange(-3,4.1,1))
@@ -508,10 +516,10 @@ class plot():
         ax3.scatter(DEC, b, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax3.set_title('b vs DEC', fontsize=24,y=0.90)
+        ax3.set_title('b vs DEC', fontsize=24,y=0.85)
 
-        ax3.set_xlabel('DEC', fontsize=30)
-        ax3.set_ylabel('b', fontsize=30)
+        ax3.set_xlabel('DEC', fontsize=20)
+        ax3.set_ylabel('b', fontsize=20)
 
         ax3.set_ylim([-3,4])
         ax3.set_yticks(np.arange(-3,4.1,1))
@@ -527,10 +535,10 @@ class plot():
         ax4.scatter(Fiber, b, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax4.set_title('b vs FiberID', fontsize=24,y=0.90)
+        ax4.set_title('b vs FiberID', fontsize=24,y=0.85)
 
-        ax4.set_xlabel('FIberID', fontsize=30)
-        ax4.set_ylabel('b', fontsize=30)
+        ax4.set_xlabel('FIberID', fontsize=20)
+        ax4.set_ylabel('b', fontsize=20)
 
         ax4.set_ylim([-3,4])
         ax4.set_yticks(np.arange(-3,4.1,1))
@@ -581,10 +589,12 @@ class plot():
         ax1.scatter(MJD, c, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax1.set_title('c vs MJD', fontsize=24,y=0.90)
+        ax1.set_title('c vs MJD', fontsize=24,y=0.85)
 
-        ax1.set_xlabel('MJD', fontsize=30)
-        ax1.set_ylabel('c', fontsize=30)
+        ax1.set_xlabel('MJD', fontsize=20)
+        ax1.set_ylabel('c', fontsize=20)
+        ax1.set_ylim([-2,3])
+        ax1.set_yticks(np.arange(-2,3.1,1))
 
 
 
@@ -597,10 +607,12 @@ class plot():
         ax2.scatter(RA, c, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax2.set_title('c vs RA', fontsize=24,y=0.90)
+        ax2.set_title('c vs RA', fontsize=24,y=0.85)
 
-        ax2.set_xlabel('RA', fontsize=30)
-        ax2.set_ylabel('c', fontsize=30)
+        ax2.set_xlabel('RA', fontsize=20)
+        ax2.set_ylabel('c', fontsize=20)
+        ax2.set_ylim([-2,3])
+        ax2.set_yticks(np.arange(-2,3.1,1))
 
         #ax2.set_position([0.5, 0.6, 0.4, 0.4])
 
@@ -613,10 +625,12 @@ class plot():
         ax3.scatter(DEC, c, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax3.set_title('c vs DEC', fontsize=24,y=0.90)
+        ax3.set_title('c vs DEC', fontsize=24,y=0.85)
 
-        ax3.set_xlabel('DEC', fontsize=30)
-        ax3.set_ylabel('c', fontsize=30)
+        ax3.set_xlabel('DEC', fontsize=20)
+        ax3.set_ylabel('c', fontsize=20)
+        ax3.set_ylim([-2,3])
+        ax3.set_yticks(np.arange(-2,3.1,1))
 
 
 
@@ -629,10 +643,12 @@ class plot():
         ax4.scatter(Fiber, c, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax4.set_title('c vs FiberID', fontsize=24,y=0.90)
+        ax4.set_title('c vs FiberID', fontsize=24,y=0.85)
 
-        ax4.set_xlabel('FIberID', fontsize=30)
-        ax4.set_ylabel('c', fontsize=30)
+        ax4.set_xlabel('FIberID', fontsize=20)
+        ax4.set_ylabel('c', fontsize=20)
+        ax4.set_ylim([-2,3])
+        ax4.set_yticks(np.arange(-2,3.1,1))
 
 
         #ax4.set_position([0.5,0, 0.4, 0.4])
@@ -676,10 +692,13 @@ class plot():
         ax1.scatter(MJD, dchi, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax1.set_title('delta-chi-squared vs MJD', fontsize=24,y=0.90)
+        ax1.set_title('delta-chi-squared vs MJD', fontsize=24,y=0.85)
 
-        ax1.set_xlabel('MJD', fontsize=30)
-        ax1.set_ylabel('delta-chi-squared', fontsize=30)
+        ax1.set_xlabel('MJD', fontsize=20)
+        ax1.set_ylabel('delta-chi-squared', fontsize=20)
+
+        ax1.set_ylim([0,45000])
+        ax1.set_yticks(np.arange(0,45000,10000))
 
 
 
@@ -692,9 +711,12 @@ class plot():
         ax2.scatter(RA, dchi, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax2.set_title('delta-chi-squared vs RA', fontsize=24,y=0.90)
+        ax2.set_title('delta-chi-squared vs RA', fontsize=24,y=0.85)
 
-        ax2.set_xlabel('RA', fontsize=30)
+        ax2.set_xlabel('RA', fontsize=20)
+        ax2.set_ylim([0,45000])
+        ax2.set_yticks(np.arange(0,45000,10000))
+
         #ax2.set_ylabel('delta-chi-squared', fontsize=30)
 
         #ax2.set_position([0.5, 0.6, 0.4, 0.4])
@@ -708,10 +730,13 @@ class plot():
         ax3.scatter(DEC, dchi, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax3.set_title('delta-chi-squared vs DEC', fontsize=24,y=0.90)
+        ax3.set_title('delta-chi-squared vs DEC', fontsize=24,y=0.85)
 
-        ax3.set_xlabel('DEC', fontsize=30)
-        ax3.set_ylabel('delta-chi-squared', fontsize=30)
+        ax3.set_xlabel('DEC', fontsize=20)
+        ax3.set_ylabel('delta-chi-squared', fontsize=20)
+
+        ax3.set_ylim([0,45000])
+        ax3.set_yticks(np.arange(0,45000,10000))
 
 
 
@@ -724,9 +749,12 @@ class plot():
         ax4.scatter(Fiber, dchi, marker='x', c=mean_ivar,
                     vmin=10000, vmax=40000, alpha=1)
 
-        ax4.set_title('delta-chi-squared vs FiberID', fontsize=24,y=0.90)
+        ax4.set_title('delta-chi-squared vs FiberID', fontsize=24,y=0.85)
 
-        ax4.set_xlabel('FIberID', fontsize=30)
+        ax4.set_xlabel('FIberID', fontsize=20)
+        ax4.set_ylim([0,45000])
+        ax4.set_yticks(np.arange(0,45000,10000))
+
         #ax4.set_ylabel('delta-chi-squared', fontsize=30)
 
 
@@ -766,7 +794,7 @@ class plot_histogram():
         plt.legend(prop={'size': 30})
         fig.suptitle('Histogram of parameters a,b and c', fontsize=30)
         plt.xlabel('values of a, b and c', fontsize=30)
-        plt.ylabel('Number of stars', fontsize=30)
+        plt.ylabel('Number', fontsize=30)
         plt.show()
 
         print("Plot histogram abc-visits")
@@ -776,7 +804,7 @@ class plot_histogram():
     def histogram_delta_chi_visits(self,dchi):
 
         colors = ['b']
-        name = ["Delta_chi_squared"]
+        name = ["Delta-chi-squared"]
 
         # Plot histogram
         fig = plt.figure()
@@ -784,7 +812,7 @@ class plot_histogram():
         plt.legend(prop={'size': 30})
         fig.suptitle('Histogram of Delta-chi-squared', fontsize=30)
         plt.xlabel('values of Delta-chi-squared', fontsize=30)
-        plt.ylabel('Number of stars', fontsize=30)
+        plt.ylabel('Number', fontsize=30)
         plt.show()
 
         print("Plot histogram delta-chi")
@@ -800,7 +828,7 @@ class plot_histogram():
         plt.legend(prop={'size': 30})
         fig.suptitle('Histogram of RV shifts', fontsize=30)
         plt.xlabel('values of RV shifts $m/s$', fontsize=30)
-        plt.ylabel('Number of stars', fontsize=30)
+        plt.ylabel('Number', fontsize=30)
         plt.show()
 
         print("Plot histogram RVs")
@@ -859,16 +887,16 @@ class plot_continuum_pixel():
         plt.figure()
 
         for i in range(N):
-            plt.plot(wl, flux[i] + 0.5 * i, label=name[i])
-            plt.plot(wl, (flux[i] + 0.5 * i) * contmask, "ko", label=name[i])
+            plt.plot(wl, flux[i] + 0.5 * i, label=name[i], linewidth=0.7)
+            plt.plot(wl, (flux[i] + 0.5 * i) * contmask, "ko", label=name[i], markersize=2)
 
             # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
 
         axes = plt.gca()
-        axes.set_xlim([15660, 15780])
+        #axes.set_xlim([15660, 15780])
 
 
-        axes.set_xlim([16160,16280])
+        #axes.set_xlim([16160,16280])
         axes.set_ylim([0.5, 1 + 0.5 * N])
         # axes.set_yticks(np.arange(0.8,1.21,0.1))
 
@@ -923,7 +951,7 @@ class plot_continuum_pixel():
 
 
         for i in range(N):
-            plt.plot(wl, flux[i] + 0.5 * i, label=name[i])
+            plt.plot(wl, flux[i] + 0.5 * i, label=name[i],linewidth=0.7)
 
 
             # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
@@ -940,7 +968,7 @@ class plot_continuum_pixel():
         for i in range(0,n_p):
             index = peak_i[i]
 
-            plt.plot((wl[index],wl[index]), (0.5,1 + 0.5 * N), 'k-')
+            plt.plot((wl[index],wl[index]), (0.5,1 + 0.5 * N), 'k-',linewidth=1.5)
 
         axes = plt.gca()
         #axes.set_xlim([15660, 15780])
@@ -964,7 +992,7 @@ class plot_continuum_pixel():
 
 
         for i in range(N):
-            plt.plot(wl, inf_flux[i] + 0.5 * i, label=name[i])
+            plt.plot(wl, inf_flux[i] + 0.5 * i, label=name[i],linewidth=0.7)
 
 
             # plt.errorbar(wl,flux[i] + 0.3 * i, ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
@@ -980,7 +1008,7 @@ class plot_continuum_pixel():
 
         for i in range(0,n_p):
             index = peak_i[i]
-            plt.plot((wl[index], wl[index]), (0.5, 1 + 0.5 * N), 'k-')
+            plt.plot((wl[index], wl[index]), (0.5, 1 + 0.5 * N), 'k-',linewidth=1.5)
 
 
 
@@ -1000,7 +1028,7 @@ class plot_continuum_pixel():
 
         plt.show()
 
-model = plot()
+#model = plot()
 
 
 #model.MJD_ve_colorbar(MJD,velocity,meanivar)
@@ -1017,10 +1045,11 @@ model = plot()
 
 #model.a_subplot_4(a=parameters,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
+#model.b_subplot_4(b=parameters,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
 #model.c_subplot_4(c=parameters,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
-model.dchi_subplot_4(dchi=dchi,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
+#model.dchi_subplot_4(dchi=dchi,MJD=MJD,Fiber=fiber_id,RA=RA,DEC=DEC,mean_ivar=meanivar)
 
 """
 plt.plot(MJD,parameters,"ro")
@@ -1047,10 +1076,10 @@ plt.show()
 
 
 
-"""
 
 
-p = 628
+
+p = 77
 
 star_choose = fits.open(path_fits[p])
 
@@ -1074,4 +1103,3 @@ model3.plot_peak_single_star(flux = nor_i,inf_flux=inf_i)
 
 
 
-"""
