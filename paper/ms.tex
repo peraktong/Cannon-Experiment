@@ -335,9 +335,35 @@ We also compare the results between the old method(fit the whole spectra) and th
 The APOGEE team derive the radial velocities of individual visits by two steps. First, derive the relative radial velocity between each visit and the combined spectra iteratively. Second, absolute radial velocity determination of the combined spectra against a grid of synthetic spectra spanning a large range of stellar parameters. All radial velocities in these two steps are determined by cross-correlating a spectra against a template spectra. This means the result is very sensitive to the normalization method since the result of cross-correlation is influenced by normalization prominently. Also, the traditional synthesized spectra in the second step is not very reliable, which means the absolute velocity is not very accurate. From these two points, there is still much to be improved in APOGEE team's RV results. Meanwhile, the APOGEE team uses the whole spectra to determine the radial velocity, which means the continuum-fitting may mix with the velocity fit. But in our experiment, we try to only use the absorption lines of the spectra.
 \bigskip
 
+%% Let's do it in a simple way
+
 \subsection{\label{sec:level2}optimize Teff , log g and [Fe/H] simultaneously with a, b, c}
 
-Working on it...
+
+Suppose we have a trained Cannon model. To infer the labels from the fluxes, we need to minimize the objective function:
+
+\begin{equation}
+l_m \leftarrow \left[ \sum_{j=1}^{j=J}{({y_{j,n}-V(l_m)\cdot \theta_j)^2} \over {e^2_{j,n}}} \right]
+\end{equation}
+
+$l_m$ is the $m$ th label of star n. V is the vectorizer and ${e^2_{j,n}}$ is the error of star n at pixel j, which include scatter and variance.
+
+If we include parameters a, b and c, the objective function will be:
+
+\begin{equation}
+l_m, a, b, c \leftarrow \left[ \sum_{j=1}^{j=J}{({y_{j,n} - a*V(l_m)\cdot \theta_{j + 1} - b*V(l_m)\cdot \theta_{j} - c*V(l_m)\cdot \theta_{j-1})^2} \over {e^2_{j,n}}} \right]
+\end{equation}
+
+Now we can obtain inferred labels and a, b and c simultaneously. And the new inferred flux is:
+
+\begin{equation}
+y_{j,n}^{inf,sim} = a*V(l_m)\cdot \theta_{j + 1} - b*V(l_m)\cdot \theta_{j} - c*V(l_m)\cdot \theta_{j-1}
+\end{equation}
+
+$y_{j,n}^{inf,sim} $ is the inferred flux from the new method, which fits labels and abc simultaneously.
+
+The results from this method are in experiment 5
+
 
 
 %% Third paragraph
@@ -525,6 +551,51 @@ In conclusion, the method we use to determine the RV shifts is good. It gives mo
 \centerline{The black lines and blue lines are data spectra and inferred spectra from the Cannon.}
 
 \end{center}
+
+
+ \subsection{\label{sec:level2}Experiment 5}
+ In experiment 5, we will check whether our method works. The method is to plot the new inferred labels against reference labels. Here we use the 548 stars in the training set. 
+ 
+ 
+ \begin{center}
+\includegraphics[width=170mm]{sim_diagnostic.png}
+
+\centerline{Fig.15 Inferred labels VS reference labels of the new method.}
+
+\end{center}
+
+From figure 15 we can see that the inferred labels are close to the reference labels, which means the method works.
+ 
+ 
+ 
+ After that, we show the histogram of parameters a, b and c.
+ 
+ \begin{center}
+\includegraphics[width=170mm]{hist_rv_abc_sim.png}
+
+\centerline{Fig.16 The histogram of the results from simultaneous fitting}
+
+\end{center}
+
+We also shows the results VS FiberID, RA, DEC, SNR, HJD and AirMass.
+
+ \begin{center}
+\includegraphics[width=170mm]{ve_vs_all_sim.png}
+
+\centerline{Fig.17 RV shifts from simultaneous fitting}
+
+\end{center}
+
+# We also compare the results from the whole spectrum(The original method) and fitting simultaneously.
+
+ \begin{center}
+\includegraphics[width=170mm]{old_vs_new_sim.png}
+
+\centerline{Fig.18 Comparison of the results from fitting the whole spectrum and fitting simultaneously}
+
+\end{center}
+
+
 
 
   
