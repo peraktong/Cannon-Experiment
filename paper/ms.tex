@@ -337,13 +337,13 @@ The APOGEE team derive the radial velocities of individual visits by two steps. 
 
 %% Let's do it in a simple way
 
-\subsection{\label{sec:level2}optimize Teff , log g and [Fe/H] simultaneously with a, b, c}
+\subsection{\label{sec:level2} Optimize Teff , log g and [Fe/H] simultaneously with a, b, c}
 
 
 Suppose we have a trained Cannon model. To infer the labels from the fluxes, we need to minimize the objective function:
 
 \begin{equation}
-l_m \leftarrow \left[ \sum_{j=1}^{j=J}{({y_{j,n}-V(l_m)\cdot \theta_j)^2} \over {e^2_{j,n}}} \right]
+l_m \leftarrow argmin \left[ \sum_{j=1}^{j=J}{({y_{j,n}-V(l_m)\cdot \theta_j)^2} \over {e^2_{j,n}}} \right]
 \end{equation}
 
 $l_m$ is the $m$ th label of star n. V is the vectorizer and ${e^2_{j,n}}$ is the error of star n at pixel j, which include scatter and variance.
@@ -351,7 +351,7 @@ $l_m$ is the $m$ th label of star n. V is the vectorizer and ${e^2_{j,n}}$ is th
 If we include parameters a, b and c, the objective function will be:
 
 \begin{equation}
-l_m, a, b, c \leftarrow \left[ \sum_{j=1}^{j=J}{({y_{j,n} - a*V(l_m)\cdot \theta_{j + 1} - b*V(l_m)\cdot \theta_{j} - c*V(l_m)\cdot \theta_{j-1})^2} \over {e^2_{j,n}}} \right]
+l_m, a, b, c \leftarrow argmin \left[ \sum_{j=1}^{j=J}{({y_{j,n} - a*V(l_m)\cdot \theta_{j + 1} - b*V(l_m)\cdot \theta_{j} - c*V(l_m)\cdot \theta_{j-1})^2} \over {e^2_{j,n}}} \right]
 \end{equation}
 
 Now we can obtain inferred labels and a, b and c simultaneously. And the new inferred flux is:
@@ -568,7 +568,7 @@ From figure 15 we can see that the inferred labels are close to the reference la
  
  
  
- After that, we show the histogram of parameters a, b and c.
+After that, we show the histogram of parameters a, b and c, which are from individual visits of the 654 stars in the former experiment.
  
  \begin{center}
 \includegraphics[width=170mm]{hist_rv_abc_sim.png}
@@ -586,7 +586,7 @@ We also shows the results VS FiberID, RA, DEC, SNR, HJD and AirMass.
 
 \end{center}
 
-# We also compare the results from the whole spectrum(The original method) and fitting simultaneously.
+We also compare the results from the whole spectrum(The original method) and fitting simultaneously.
 
  \begin{center}
 \includegraphics[width=170mm]{old_vs_new_sim.png}
@@ -594,6 +594,40 @@ We also shows the results VS FiberID, RA, DEC, SNR, HJD and AirMass.
 \centerline{Fig.18 Comparison of the results from fitting the whole spectrum and fitting simultaneously}
 
 \end{center}
+
+Finally, we choose the sixteen visits with biggest $delta_RV$, which is defined as the difference between the RV shifts from the whole spectrum(The original method) and simultaneous fitting.
+
+
+ \begin{center}
+\includegraphics[width=170mm]{big_delta_rv_sim.png}
+
+\centerline{Fig.18 The visits with biggest $delta_RV$ part 1}
+
+\end{center}
+
+ \begin{center}
+\includegraphics[width=170mm]{big_delta_rv_sim2.png}
+
+\centerline{Fig.19 The visits with biggest $delta_RV$ part 2}
+
+\end{center}
+
+
+ \begin{center}
+\includegraphics[width=170mm]{big_delta_rv_sim3.png}
+
+\centerline{Fig.20 The visits with biggest $delta_RV$ part 4}
+
+\end{center}
+
+
+ \begin{center}
+\includegraphics[width=170mm]{big_delta_rv_sim4.png}
+
+\centerline{Fig.21 The visits with biggest $delta_RV$ part 4}
+
+\end{center}
+
 
 
 
