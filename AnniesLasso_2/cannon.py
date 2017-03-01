@@ -1135,7 +1135,7 @@ def _fit_spectrum_opt2(normalized_flux, normalized_ivar, dispersion, initial_lab
     # z
 
     theta_z = np.vstack((one, theta))
-    theta_z = theta_z[0, :row]
+    theta_z = theta_z[0:row,:]
 
 
     def f_opt(xdata, *parameters):
@@ -1220,20 +1220,37 @@ def _fit_spectrum_opt2(normalized_flux, normalized_ivar, dispersion, initial_lab
     print("initial labels")
     print(initial_labels)
 
-    p0 = initial_labels
+    for p0 in np.atleast_2d(initial_labels):
+        kwds["p0"] = list(p0)
 
-    kwds["p0"] = list(p0)
 
-    op_labels, cov = op.curve_fit(**kwds)
 
-    # let's separate a,b,c from labels
+        if model_redshift:
+            kwds["p0"] += [0]
 
-    # The are combined together
-    print("simultaneously optimize abc and labels")
-    print(op_labels)
+        if model_lsf:
+            kwds["p0"] += [5]  # MAGIC
 
-    c20 = op_labels
-    c20_a = cov
+
+
+
+        try:
+            op_labels, cov = op.curve_fit(**kwds)
+
+            # let's separate a,b,c from labels
+
+            # The are combined together
+            print("simultaneously optimize abc and labels")
+            print(op_labels)
+
+            c20 = op_labels
+            c20_a = cov
+
+        except RuntimeError:
+            logger.exception("Exception in fitting from {}".format(p0))
+            c20 = initial_labels
+            c20_a = []
+            continue
 
     return c20, c20_a
 
