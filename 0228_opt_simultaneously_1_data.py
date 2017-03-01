@@ -148,7 +148,8 @@ for i in range(0,N):
 
         flux_j = np.atleast_2d(flux[j,:])
         ivar_j = np.atleast_2d(ivar[j,:])
-        initial_j = np.atleast_2d(initial_labels[j,:])
+        #initial_j = np.atleast_2d(initial_labels[j,:])
+        initial_j = np.atleast_2d([4678.85,1.980,-1.385,0,1,0])
 
         label_6,un = model.fit_opt(flux_j, ivar_j, initial_labels=initial_j)
 
@@ -167,6 +168,8 @@ for i in range(0,N):
         inf_flux = a*np.dot(v_sim, theta_x.T)+b*np.dot(v_sim, theta_y.T)+c*np.dot(v_sim, theta_z.T)
 
         result.append(label_6)
+
+        inf_flux = np.ravel(inf_flux)
         inf_flux_sim.append(inf_flux)
 
 

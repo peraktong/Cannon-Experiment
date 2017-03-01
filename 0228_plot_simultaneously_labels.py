@@ -176,6 +176,14 @@ class plot():
         star_visit = np.array(star_visit)
         self.star_visit = star_visit
 
+        a = self.parameters_sim[:, 0]
+        b = self.parameters_sim[:, 1]
+        c = self.parameters_sim[:, 2]
+
+        velocity_sim = (c - a) / (a + b + c) * 4144.68
+
+        self.velocity_sim = velocity_sim
+
         print("star name shape")
         print(star_name.shape,star_visit.shape)
 
@@ -1714,14 +1722,14 @@ class plot():
 #rv
         ax1.plot(RV,RV_sim,"ro",label="RV shifts", markersize=3,alpha = alpha)
         ax1.plot(RV,RV,"k-")
-        ax1.set_xlabel("RV shifts by fitting the whole spectrum $m/s$", fontsize=14)
+        ax1.set_xlabel("RV shifts by fitting separately $m/s$", fontsize=14)
         ax1.set_ylabel("RV shifts by fitting simultaneously $m/s$", fontsize=14)
 
 #a
 
         ax2.plot(parameters[:,0],parameters_sim[:,0],"ro",label="Parameter a",markersize=3,alpha = alpha)
         ax2.plot(parameters[:,0],parameters[:,0], "k-")
-        ax2.set_xlabel("a by fitting the whole spectrum", fontsize=14)
+        ax2.set_xlabel("a by fitting separately", fontsize=14)
         ax2.set_ylabel("a by fitting simultaneously", fontsize=14)
 
 
@@ -1730,7 +1738,7 @@ class plot():
 
         ax3.plot(parameters[:,1],parameters_sim[:,1],"ro",label="Parameter b", markersize=3,alpha = alpha)
         ax3.plot(parameters[:,1],parameters[:,1], "k-")
-        ax3.set_xlabel("b by fitting the whole spectrum", fontsize=14)
+        ax3.set_xlabel("b by fitting separately", fontsize=14)
         ax3.set_ylabel("b by fitting simultaneously", fontsize=14)
 
 
@@ -1738,7 +1746,7 @@ class plot():
 
         ax4.plot(parameters[:,2],parameters_sim[:,2],"ro",label="Parameter c", markersize=3,alpha = alpha)
         ax4.plot(parameters[:, 2], parameters[:, 2], "k-")
-        ax4.set_xlabel("c by fitting the whole spectrum", fontsize=14)
+        ax4.set_xlabel("c by fitting separately", fontsize=14)
         ax4.set_ylabel("c by fitting simultaneously", fontsize=14)
 
 
@@ -1747,20 +1755,16 @@ class plot():
 
         plt.show()
 
-    def choose_four_biggest_RV_for_new_method(self):
-        # return index
-        N = len(self.velocity_new)
-        index = self.velocity_new.argsort()[N-8:N-4]
-        print(self.velocity_new[index])
-
-        # from small to big
-        print(index)
-
-        return index
-
     def choose_four_biggest_delta_rv(self):
         N = len(self.velocity_new)
-        index = abs(self.velocity-self.velocity_new).argsort()[N-8:N-4]
+
+        a = self.parameters_sim[:,0]
+        b = self.parameters_sim[:,1]
+        c = self.parameters_sim[:,2]
+
+        velocity_sim = (c-a)/(a+b+c)*4144.68
+
+        index = abs(self.velocity-velocity_sim).argsort()[N-20:N-16]
 
         print(index)
         return index
@@ -1769,12 +1773,20 @@ class plot():
 
     def plot_visit_sim_old(self,index):
 
+        # set font size
+
+        font = {'family': 'normal',
+                'weight': 'bold',
+                'size': 8}
+
+        matplotlib.rc('font', **font)
+
 
         # only choose individual visits:
         N = len(index)
         for i in range(0,N):
 
-            # mask
+            # left
             plt.subplot(N,2,2*i+1)
             star = fits.open(self.star_name[index[i]])
 
@@ -1784,41 +1796,79 @@ class plot():
             ind = self.star_visit[index[i]]
             flux = star[0].data[ind+2,:]
             inf = star[2].data[ind + 2, :]
-            mask = star[13].data[ind+2,:]
+            inf_label = star[9].data[ind+2,0:3]
+
+            # simultaneously
+            inf_label_sim = star[18].data[ind+2,0:3]
+            inf_sim = star[19].data[ind + 2, :]
+
+            ## Add inf labels
 
             plt.step(wl, flux, "k", label="One visit of star %s"%name, linewidth=0.7, alpha=1)
-            plt.plot(wl, flux*mask, "ro", label="The absorption line", markersize=1, alpha=0.5)
+            plt.plot(wl, inf, "b", label="Inferred flux from fitting separately Teff=%.2fK logg=%.2f Fe/H =%.2f"%(inf_label[0],inf_label[1],inf_label[2]), linewidth=0.7, alpha=0.5)
+            plt.plot(wl, inf_sim, "g", label="Inferred flux from fitting simultaneously Teff=%.2fK logg=%.2f Fe/H =%.2f"%(inf_label_sim[0],inf_label_sim[1],inf_label_sim[2]), linewidth=0.7, alpha=0.5)
             plt.ylabel("Flux", fontsize=20)
             axes = plt.gca()
             axes.set_xlim([15660, 15780])
+            # share x axis
+
+            if i==N-1:
+                non =1
+            else:
+                axes.set_xticklabels([])
+
+
+
+
             # axes.set_xlim([16160,16280])
-            axes.set_ylim([0.5, 1.5])
+            axes.set_ylim([0.5, 2])
+            axes.set_yticks(np.arange(0.5,2.01,0.5))
             plt.legend()
 
             # inf
 
             plt.subplot(N,2,2*i+2)
 
-            plt.step(wl, flux, "k", label="From the whole spectrum RV=%.2f $m/s$ a=%.2f b=%.2f c=%.2f" % (
-            self.velocity[index[i]], self.parameters[index[i],0], self.parameters[index[i],1], self.parameters[index[i],2]), linewidth=0.7, alpha=1)
-            plt.plot(wl, inf, "b", label="From the absorption line RV=%.2f $m/s$ a=%.2f b=%.2f c=%.2f" % (
-            self.velocity_new[index[i]], self.parameters_new[index[i],0], self.parameters_new[index[i],1], self.parameters_new[index[i],2]), linewidth=0.7,
-                     alpha=0.5)
+            plt.step(wl, flux, "k", label="One visit of star %s" % name, linewidth=0.7, alpha=1)
+
+
+            plt.plot(wl, inf, "b", label="From fitting separately RV=%.2f $m/s$ a=%.2f b=%.2f c=%.2f" % (
+            self.velocity[index[i]], self.parameters[index[i],0], self.parameters[index[i],1], self.parameters[index[i],2]), linewidth=0.7, alpha=0.5)
+
+            plt.plot(wl, inf_sim, "g", label="From fitting simultaneously RV=%.2f $m/s$ a=%.2f b=%.2f c=%.2f" % (
+                self.velocity_sim[index[i]], self.parameters_sim[index[i], 0], self.parameters_sim[index[i], 1],
+                self.parameters_sim[index[i], 2]), linewidth=0.7, alpha=0.5)
+
 
             # plt.errorbar(wl,flux[i], ecolor='k', alpha=0.02, capthick=0.2, yerr=ivar[i]**(-0.5))
 
 
             axes = plt.gca()
-            axes.set_xlim([15660, 15780])
-            # axes.set_xlim([16160,16280])
-            axes.set_ylim([0.5, 1.5])
-            # axes.set_yticks(np.arange(0.8,1.21,0.1))
+            #axes.set_xlim([15660, 15780])
+            axes.set_xlim([16160,16280])
+
+
+            if i==N-1:
+                non =1
+            else:
+                axes.set_xticklabels([])
+
+
+
+
+            axes.set_ylim([0.5, 2])
+            axes.set_yticks(np.arange(0.5,2.01,0.5))
 
             # plt.xlabel("Wave length $\AA$", fontsize=20)
             #plt.ylabel("Flux", fontsize=20)
 
             plt.legend()
         plt.suptitle("The fitting result of visits with the biggest delta RV shifts", fontsize=20)
+
+        # share x
+        plt.subplots_adjust(hspace=.0)
+
+
 
         plt.show()
 
@@ -1868,7 +1918,6 @@ model.read_data()
 
 # old vs new
 
-
 model.old_vs_new_sim()
 # choose five stars and plot:
 # individual visit:
@@ -1887,4 +1936,4 @@ model.old_vs_new_sim()
 #big_4 = model.choose_four_biggest_RV_for_new_method()
 #big_delta_4 = model.choose_four_biggest_delta_rv()
 
-#model.plot_visit_mask_result(big_4)
+#model.plot_visit_sim_old(big_delta_4)
