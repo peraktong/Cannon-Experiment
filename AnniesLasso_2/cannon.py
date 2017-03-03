@@ -608,7 +608,7 @@ class CannonModel(model.BaseCannonModel):
             print("Calculating delta-chi-squared",p,"{:.2f}%".format(p/N_star*100))
 
             for i in range(0, ni):
-                c[i, i] = ivar_r[i]**0.5
+                c[i, i] = ivar_r[i]
 
             # correct chi-squared
 
@@ -638,7 +638,7 @@ class CannonModel(model.BaseCannonModel):
             print("Calculating delta-chi-squared",p,"{:.2f}%".format(p/N_star*100))
 
             for i in range(0, ni):
-                c[i, i] = ivar_r[i]**0.5
+                c[i, i] = ivar_r[i]
 
             # correct chi-squared
 
