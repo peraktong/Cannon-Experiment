@@ -414,11 +414,11 @@ class fit_absorption_line():
 
         # flux m maintain the shape of flux. However, some elements are 0.
 
-        flux_m = np.ma.masked_equal(flux*mask,0)
+        flux_m = flux[mask]
 
-        ivar_m = ivar*mask
+        ivar_m = ivar[mask]
 
-        inf_flux_m = np.ma.masked_equal(inf_flux*mask,0)
+        inf_flux_m = inf_flux[mask]
 
         self.flux_m = flux_m
         self.ivar_m = ivar_m
