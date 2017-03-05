@@ -282,8 +282,8 @@ class fit_absorption_line():
 
             mask_i = np.zeros(N_pixel)
 
-            width = 8
-            limit = 1
+            width = 5
+            limit = 0.95
 
             for j in range(15,N_pixel-15):
                 flux_j = flux[i,j]
