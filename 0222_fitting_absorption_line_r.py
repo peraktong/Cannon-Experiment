@@ -438,7 +438,7 @@ class fit_absorption_line():
         #inf_flux = np.dot(v, self.model.theta.T)
         # attention! only change ivar. Do no touch inf_flux/flux!!
         opt_flux_m, parameters_m = self.model.fitting_spectrum_parameters_single \
-            (flux, ivar_m, inf_flux)
+            (flux_m, ivar_m, inf_flux_m)
 
         self.parameters_m = parameters_m
         self.opt_flux_m = opt_flux_m
