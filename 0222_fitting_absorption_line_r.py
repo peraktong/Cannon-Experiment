@@ -210,11 +210,11 @@ def get_pixmask(flux, err):
 class fit_absorption_line():
 
     # Oh, mask is important
-    # set pixel to be 10 and flux<0.95
+    # set pixel to be 5 and flux<0.95
 
     def find_mask(self,flux):
 
-        # use 10 pixel:
+        # use 5 pixel:
         N_pixel = len(flux[0,:])
         N_star = len(flux[:,0])
 
