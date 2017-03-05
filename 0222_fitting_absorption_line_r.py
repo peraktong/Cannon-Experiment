@@ -412,7 +412,7 @@ class fit_absorption_line():
         one = flux/flux
 
 
-        # flux m maintain the shape of flux. However, some elements are 0.
+        # flux m is shorter than flux since it only contains absorption lines.
 
         flux_m = flux[mask]
 
