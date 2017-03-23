@@ -139,7 +139,7 @@ class plot():
         #ax1
 
         ax1.scatter(teff,logg, marker='x', c=feh,
-                    vmin=np.min(feh), vmax=np.max(feh), alpha=alpha)
+                    vmin=np.min(feh), vmax=np.max(feh), alpha=alpha, cmap=cm.coolwarm)
 
         ax1.set_xlabel('Teff $K$', fontsize=20)
         ax1.set_ylabel('Logg ', fontsize=20)
@@ -196,7 +196,7 @@ class plot():
         #ax1
 
         ax1.scatter(BJD,shift, marker='x', c=feh,
-                    vmin=np.min(feh), vmax=np.max(feh), alpha=alpha)
+                    vmin=np.min(feh), vmax=np.max(feh), alpha=alpha, cmap=cm.coolwarm)
 
         ax1.set_xlabel('BJD', fontsize=20)
         ax1.set_ylabel('RV shift $km/s$ ', fontsize=20)
@@ -257,7 +257,7 @@ class plot():
         #ax1
 
         ax1.scatter(fiber,portion, marker='x', c=RV,
-                    vmin=np.min(RV), vmax=np.max(RV), alpha=alpha)
+                    vmin=np.min(RV), vmax=np.max(RV), alpha=alpha, cmap=cm.coolwarm)
 
         ax1.set_xlabel('FiberID', fontsize=20)
         ax1.set_ylabel('$(c+a)/(a+b+c)$ ', fontsize=20)
@@ -317,7 +317,7 @@ class plot():
         #ax1
 
         ax1.scatter(SNR,delta_chi, marker='x', c=RV,
-                    vmin=np.min(RV), vmax=np.max(RV), alpha=alpha)
+                    vmin=np.min(RV), vmax=np.max(RV), alpha=alpha, cmap=cm.coolwarm)
 
         ax1.set_xlabel('SNR', fontsize=20)
         ax1.set_ylabel('Delta chi squared ', fontsize=20)
