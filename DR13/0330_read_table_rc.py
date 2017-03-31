@@ -816,8 +816,8 @@ class plot():
             std_new_i = np.std(VBARY[index]+shift[index])
 
             teff_i = np.nanmedian(teff[index])
-            logg_i = np.nanmedian(teff[index])
-            feh_i = np.nanmedian(teff[index])
+            logg_i = np.nanmedian(logg[index])
+            feh_i = np.nanmedian(feh[index])
 
             fusion_new.append([target[i],std_old_i,std_new_i,teff_i,logg_i,feh_i])
 
@@ -832,9 +832,12 @@ class plot():
         # portion+fiber+rv
 
         # name = fusion_new[:, 0]
-        std_old = np.array(fusion_new[:,1]).ravel()
-        std_new = np.array(fusion_new[:,2]).ravel()
-        teff = np.array(fusion_new[:,3]).ravel()
+        std_old = np.array(fusion_new[:,1],dtype=np.float32).ravel()
+        std_new = np.array(fusion_new[:,2],dtype=np.float32).ravel()
+
+        # use int
+        teff = np.array(fusion_new[:,3],dtype=np.float16).ravel()
+
 
 
         font = {'family': 'normal',
@@ -854,13 +857,13 @@ class plot():
                     vmin=np.min(teff), vmax=np.max(teff), alpha=alpha, cmap=cm.coolwarm)
         ax1.plot(std_old,std_old,"k",alpha=alpha,linewidth=0.3)
 
-        ax1.set_xlabel('Standard deviations of RVs before the correction $km/s$', fontsize=20)
-        ax1.set_ylabel('Standard deviations of RVs after the correction $km/s$', fontsize=20)
+        ax1.set_xlabel('Std of RVs before the correction $km/s$', fontsize=20)
+        ax1.set_ylabel('Std of RVs after the correction $km/s$', fontsize=20)
 
         f.subplots_adjust(right=0.8)
 
 
-        pl = ax1.scatter(VBARY,VBARY+shift, marker='x', c=teff,
+        pl = ax1.scatter(std_old,std_new, marker='x', c=teff,
                     vmin=np.min(teff), vmax=np.max(teff), alpha=alpha, cmap=cm.coolwarm)
 
 
@@ -902,9 +905,9 @@ class plot():
 
 
         # name = fusion_new[:, 0]
-        std_old = np.array(fusion_new[:,1]).ravel()
-        std_new = np.array(fusion_new[:,2]).ravel()
-        logg = np.array(fusion_new[:,4]).ravel()
+        std_old = np.array(fusion_new[:,1],dtype=np.float32).ravel()
+        std_new = np.array(fusion_new[:,2],dtype=np.float32).ravel()
+        logg = np.array(fusion_new[:,4],dtype=np.float16).ravel()
 
 
 
@@ -927,8 +930,8 @@ class plot():
 
         ax1.plot(std_old,std_old, "k", alpha=alpha, linewidth=0.3)
 
-        ax1.set_xlabel('Standard deviations of RVs before the correction $km/s$', fontsize=20)
-        ax1.set_ylabel('Standard deviations of RVs after the correction $km/s$', fontsize=20)
+        ax1.set_xlabel('Std of RVs before the correction $km/s$', fontsize=20)
+        ax1.set_ylabel('Sts of RVs after the correction $km/s$', fontsize=20)
 
         f.subplots_adjust(right=0.8)
 
@@ -974,9 +977,9 @@ class plot():
 
 
         # name = fusion_new[:, 0]
-        std_old = np.array(fusion_new[:,1]).ravel()
-        std_new = np.array(fusion_new[:,2]).ravel()
-        feh = np.array(fusion_new[:,5]).ravel()
+        std_old = np.array(fusion_new[:,1],dtype=np.float32).ravel()
+        std_new = np.array(fusion_new[:,2],dtype=np.float32).ravel()
+        feh = np.array(fusion_new[:,5],dtype=np.float16).ravel()
 
 
 
@@ -998,8 +1001,8 @@ class plot():
 
         ax1.plot(std_old,std_old, "k", alpha=alpha, linewidth=0.3)
 
-        ax1.set_xlabel('Standard deviations of RVs before the correction $km/s$', fontsize=20)
-        ax1.set_ylabel('Standard deviations of RVs after the correction $km/s$', fontsize=20)
+        ax1.set_xlabel('Std of RVs before the correction $km/s$', fontsize=20)
+        ax1.set_ylabel('Std of RVs after the correction $km/s$', fontsize=20)
 
         f.subplots_adjust(right=0.8)
 
