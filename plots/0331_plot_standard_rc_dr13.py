@@ -180,6 +180,8 @@ class plot():
 
         cb = f.colorbar(pl, cax=cbar_ax)
 
+        cb.solids.set_edgecolor("face")
+
 
         cb.set_label("$RV shifts \quad (Km/s)$", fontsize=20)
 
@@ -258,6 +260,8 @@ class plot():
 
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
+
+        cb.solids.set_edgecolor("face")
 
 
         cb.set_label("$RV \quad shifts \quad (Km/s)$", fontsize=20,weight="bold")
@@ -341,6 +345,8 @@ class plot():
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
 
+        cb.solids.set_edgecolor("face")
+
 
         cb.set_label("$2b-a-c$ ", fontsize=20,weight="bold")
 
@@ -421,6 +427,8 @@ class plot():
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
 
+        cb.solids.set_edgecolor("face")
+
 
         cb.set_label("$2b-a-c$", fontsize=20,weight="bold")
 
@@ -484,6 +492,8 @@ class plot():
 
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
+
+        cb.solids.set_edgecolor("face")
 
 
         cb.set_label("$Fe/H \quad (dex)$", fontsize=20,weight="bold")
@@ -555,6 +565,8 @@ class plot():
 
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
+
+        cb.solids.set_edgecolor("face")
 
 
         cb.set_label("$SNR$", fontsize=20,weight="bold")
@@ -632,6 +644,8 @@ class plot():
 
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
+
+        cb.solids.set_edgecolor("face")
 
 
         cb.set_label("$RV \quad shifts \quad (Km/s)$", fontsize=20,weight="bold")
@@ -895,6 +909,8 @@ class plot():
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
 
+        cb.solids.set_edgecolor("face")
+
 
         cb.set_label("$Teff \quad (K)$", fontsize=20,weight="bold")
 
@@ -982,6 +998,8 @@ class plot():
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
 
+        cb.solids.set_edgecolor("face")
+
 
         cb.set_label("$logg \quad (dex)$", fontsize=20,weight="bold")
 
@@ -1064,6 +1082,8 @@ class plot():
 
         cbar_ax = f.add_axes([0.85, 0.15, 0.02, 0.7])
         cb = f.colorbar(pl, cax=cbar_ax)
+
+        cb.solids.set_edgecolor("face")
 
 
         cb.set_label("$FeH \quad (dex)$", fontsize=20,weight="bold")
