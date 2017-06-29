@@ -73,7 +73,7 @@ image_path = np.array(["apVisit-r6-5094-55874-088.fits","apVisit-r6-5094-56643-0
 
 
 
-# index!!
+# index!! For which visit
 index=0
 
 image = fits.open(data_path+image_path[index],ignore_missing_end=True)
@@ -124,12 +124,6 @@ y_inter = sinc_interp(x=flux_raw,s=wl_raw_log,u=wl_log)
 
 # Add velocity
 
-# Linear
-# y_inter = np.interp(x=wl,xp=wl_raw,fp=flux_raw)
-
-
-print(y_inter.shape)
-
 # labels
 array = np.array([[  4.80458566e+03 ,  2.57179854e+00 , -2.01372206e-01],
  [  4.79263171e+03  , 2.64864274e+00,  -1.82310447e-01],
@@ -141,10 +135,10 @@ array = np.array([[  4.80458566e+03 ,  2.57179854e+00 , -2.01372206e-01],
 
 ### Normalize y spectra:
 
-y_inter = y_inter*(np.nansum(apstar[1].data[2+index,:]))/np.nansum(y_inter)
+# y_inter = y_inter*(np.nansum(apstar[1].data[2+index,:]))/np.nansum(y_inter)
 
 
-
+############ plots
 
 font = {'family': 'normal',
         'weight': 'bold',
