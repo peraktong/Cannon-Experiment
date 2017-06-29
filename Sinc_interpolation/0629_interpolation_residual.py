@@ -17,8 +17,36 @@ def log(x):
         return -np.inf
 
 
+def sinc_interp(x, s, u):
+
+    # Your x is the raw flux
+    # Your s is the wave length of the raw flux. s should have equal distance
+
+    # Your u is the log wl, which has equal distance between the neighborhoods.
+    # The length of u is 8575 and you can use log wl
+
+    if len(x) != len(s):
+        print("len(x) should be equal to len(s")
+
+    # Find the period
+    # T_r = s[1] - s[0]
+
+    # I don't think these two methods have a big different.
+
+    # Can we use this?
+    # parameter a:
+    a =1
+
+    N = len(s)
+    T = a*(s[N-1]-s[0])/N
+
+    sincM = np.tile(u, (len(s), 1)) - np.tile(s[:, np.newaxis], (1, len(u)))
+    y = np.dot(x, np.sinc(sincM / T))
+    return y
 
 
+
+log = np.vectorize(log)
 
 pkl_file = open('wl.pkl', 'rb')
 wl = pickle.load(pkl_file)
@@ -88,15 +116,19 @@ wl_raw = wl_raw[::-1]
 
 ## Do interpolation:
 
+wl_log = log(wl)
+wl_raw_log = log(wl_raw)
+
+print("doing interpolation")
+y_inter = sinc_interp(x=flux_raw,s=wl_raw_log,u=wl_log)
+
 # Add velocity
 
-# 3.5 dither for red!!!
+# Linear
+# y_inter = np.interp(x=wl,xp=wl_raw,fp=flux_raw)
 
-
-y_inter = np.interp(x=wl,xp=wl_raw,fp=flux_raw)
 
 print(y_inter.shape)
-
 
 # labels
 array = np.array([[  4.80458566e+03 ,  2.57179854e+00 , -2.01372206e-01],
@@ -105,6 +137,11 @@ array = np.array([[  4.80458566e+03 ,  2.57179854e+00 , -2.01372206e-01],
  [  4.80550440e+03  , 2.57941485e+00 , -2.04721940e-01],
  [  4.79156434e+03 ,  2.63379621e+00 , -1.83733041e-01],
  [  4.77938538e+03 ,  2.65496682e+00 , -1.83967319e-01]])
+
+
+### Normalize y spectra:
+
+y_inter = y_inter*(np.nansum(apstar[1].data[2+index,:]))/np.nansum(y_inter)
 
 
 
