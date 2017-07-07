@@ -57,11 +57,11 @@ def sinc_interp(x, s, u, a):
 
     # T is a matrix with the same shape with sincM
 
-    s2 = np.append(s,s[-1])
-    s1 = np.append(0,s)
+    #s2 = np.append(s,s[-1])
+    #s1 = np.append(0,s)
 
 
-    delta_s = (s2-s1)[0:-1]
+    #delta_s = (s2-s1)[0:-1]
 
     T = (s[N - 1] - s[0]) / N
 
